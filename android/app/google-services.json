@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "738595429867",
+    "project_id": "it-department-2022",
+    "storage_bucket": "it-department-2022.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738595429867:android:157f458f514a39e2c00dae",
+        "android_client_info": {
+          "package_name": "com.futureofegypt.it_department"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738595429867-1ccobjtqmndftip3hmn3thskuebtipgr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0UUfRDnakowescJnh90rwtOTF-pUij70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738595429867-1ccobjtqmndftip3hmn3thskuebtipgr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

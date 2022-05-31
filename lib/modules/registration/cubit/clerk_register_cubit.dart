@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -45,6 +46,12 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
   String? personPhone,personDocumentValue;
   bool isCivil = false;
   bool isManager = false;
+
+  void clearList(){
+    clerkList.clear();
+    clerkFirebaseList.clear();
+    emit(ClerkRegisterClearListsState());
+  }
 
   void changePasswordVisibility() {
     isPassword = !isPassword;
@@ -288,10 +295,10 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
   void uploadUserFirebase(BuildContext context, String clerkID, String clerkName,String clerkNumber, String clerkPhone, String clerkPassword, String clerkAddress,String clerkDepartment,
       String managementID, String managementName, String typeName, String rankName, String categoryName, String jobName,
       String presenceName, String coreStrengthName)async {
-
+    emit(ClerkRegisterLoadingUploadClerksState());
     try {
       FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: "$clerkID@it.com",
+          email: "$clerkNumber@it.com",
           password: clerkPassword
       ).then((value) async {
         FirebaseMessaging.instance.getToken().then((value){
@@ -321,13 +328,13 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
       String clerkToken,String clerkDepartment, String managementID, String managementName, String typeName, String rankName, String categoryName, String jobName,
       String presenceName, String coreStrengthName) async {
 
-    var storageRef = FirebaseStorage.instance.ref("Clerks/$clerkPhone");
-    FirebaseDatabase database = FirebaseDatabase.instance;
-    var clerksRef = database.reference().child("Clerks");
+    var storageRef = FirebaseStorage.instance.ref("Clerks/$clerkNumber");
+    FirebaseFirestore database = FirebaseFirestore.instance;
+    var clerksCollection = database.collection("Clerks");
 
     Map<String, Object> dataMap = HashMap();
 
-    dataMap['ClerkID'] = clerkID;
+    dataMap['ClerkID'] = clerkNumber;
     dataMap['ClerkName'] = clerkName;
     dataMap['ClerkNumber'] = clerkNumber;
     dataMap['ClerkPhone'] = clerkPhone;
@@ -345,7 +352,7 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
     dataMap["ClerkToken"] = clerkToken;
     dataMap["ClerkSubscriptions"] = ["empty"];
 
-      clerksRef.child(clerkID).set(dataMap).then((value) async {
+      clerksCollection.doc(clerkNumber).set(dataMap).then((value) async {
       String fileName = imageUrl;
 
       File imageFile = File(fileName);
@@ -355,7 +362,7 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
         p0.ref.getDownloadURL().then((value) {
           dataMap["ClerkImage"] = value.toString();
 
-          clerksRef.child(clerkPhone).update(dataMap).then((
+          clerksCollection.doc(clerkNumber).update(dataMap).then((
               realtimeDbValue) async {
             clerkFirebaseModel = ClerkFirebaseModel(clerkID, clerkName, value.toString(), managementID, jobName, clerkNumber, clerkAddress, clerkPhone, clerkPassword, "متصل الأن", clerkToken,["empty"]);
 
@@ -379,7 +386,7 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
 
             prefs.setString("ClerkImage", value.toString()).then((value)async {
               completeRegistration = true;
-              await getDepartmentManager("1022", clerkID);
+              await getDepartmentManager("1028", clerkID);
               showToast(
                 message: "تم التسجيل بنجاح",
                 length: Toast.LENGTH_LONG,
@@ -389,19 +396,23 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
               finish(context, isManager ? const ManagerHomeScreen() : const HomeScreen());
               emit(ClerkRegisterSuccessState());
             }).catchError((error){
+              print(error.toString());
                 emit(ClerkRegisterErrorState(error.toString()));
               });
-
             }).catchError((error) {
+            print(error.toString());
               emit(ClerkRegisterErrorState(error.toString()));
             });
           }).catchError((error) {
+          print(error.toString());
             emit(ClerkRegisterErrorState(error.toString()));
           });
         }).catchError((error) {
+        print(error.toString());
           emit(ClerkRegisterErrorState(error.toString()));
         });
       }).catchError((error) {
+        print(error.toString());
         emit(ClerkRegisterErrorState(error.toString()));
       });
   }

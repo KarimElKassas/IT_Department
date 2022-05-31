@@ -1,7 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:it_department/modules/Core/screens/core_screen.dart';
+import 'package:it_department/modules/Home/screens/home_screen.dart';
+import 'package:it_department/modules/Login/clerk_login_screen.dart';
 import 'package:it_department/modules/SplashScreen/splash_screen.dart';
+import 'package:it_department/modules/registration/widgets/clerk_data_view.dart';
 import 'package:it_department/shared/bloc_observer.dart';
 
 import 'network/local/cache_helper.dart';
@@ -31,7 +35,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
       ),
-      home: const SplashScreen(),
+      home:  CoreScreen(),
     );
   }
 }

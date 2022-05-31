@@ -1,4 +1,7 @@
+import 'dart:collection';
+
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -28,9 +31,7 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
 
   void changePasswordVisibility() {
     isPassword = !isPassword;
-
-    suffix =
-    isPassword ? Icons.visibility_rounded : Icons.visibility_off_rounded;
+    suffix = isPassword ? Icons.visibility_rounded : Icons.visibility_off_rounded;
 
     emit(ClerkLoginChangePassVisibility());
   }
@@ -71,7 +72,6 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
               emit(ClerkLoginNoUserState());
             } else {
               SharedPreferences prefs = await SharedPreferences.getInstance();
-
               var userID = value.data[0]["PR_Persons_Number"].toString();
               var userName = value.data[0]["PR_Persons_Name"].toString();
               var userPassword = value.data[0]["User_Password"].toString();
@@ -86,38 +86,54 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
               var userPresenceName = value.data[0]["PR_Presence_Name"].toString();
               var userJobName = value.data[0]["PR_Jobs_Name"].toString();
 
-              FirebaseDatabase.instance.reference().child("Clerks").child(userPhone).get().then((value)async{
-                await prefs.setString("ClerkImage", value.value["ClerkImage"]!.toString());
+              FirebaseFirestore.instance.collection("Clerks").doc(userNumber).get().then((value) async {
+                  if(value.exists){
+                    FirebaseFirestore.instance.collection("Clerks").doc(userNumber).get().then((value)async{
+                      value.data()!.forEach((key, value) async {
+                        await prefs.setString("ClerkImage", value["ClerkImage"]!.toString());
+                      });
+                    });
+
+                    await prefs.setString("ClerkID", userID);
+                    await prefs.setString("ClerkName", userName);
+                    await prefs.setString("ClerkPassword", userPassword);
+                    await prefs.setString("ClerkNumber", userNumber);
+                    await prefs.setString("ClerkPhone", userPhone);
+                    await prefs.setString("ClerkManagementID", userManagementID);
+                    await prefs.setString("ClerkManagementName", userManagementName);
+                    await prefs.setString("ClerkTypeName", userTypeName);
+                    await prefs.setString("ClerkRankName", userRankName);
+                    await prefs.setString("ClerkCategoryName", userCategoryName);
+                    await prefs.setString("ClerkCoreStrengthName",userCoreStrengthName);
+                    await prefs.setString("ClerkPresenceName", userPresenceName);
+                    await prefs.setString("ClerkJobName", userJobName);
+                    await prefs.setStringList("ClerkSubscriptions", []);
+                    var token = await FirebaseMessaging.instance.getToken();
+
+                    Map<String, dynamic> dataMap = HashMap();
+                    dataMap["ClerkToken"] = token;
+                    await FirebaseFirestore.instance.collection("Clerks").doc(userNumber).update(dataMap);
+                    await prefs.setString("ClerkToken", token??"");
+
+                    showToast(
+                        message: "اهلا بيك \n $userName",
+                        length: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 3);
+
+                    await getDepartmentManager(userManagementID);
+                    finish(context, (managerID != userNumber) ? const HomeScreen() : const ManagerHomeScreen());
+                    emit(ClerkLoginSuccessState());
+                  }else{
+                    showToast(
+                        message: "برجاء انشاء حساب اولاً",
+                        length: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 3);
+                  }
+                  emit(ClerkLoginSuccessState());
+
               });
-
-              await prefs.setString("ClerkID", userID);
-              await prefs.setString("ClerkName", userName);
-              await prefs.setString("ClerkPassword", userPassword);
-              await prefs.setString("ClerkNumber", userNumber);
-              await prefs.setString("ClerkPhone", userPhone);
-              await prefs.setString("ClerkManagementID", userManagementID);
-              await prefs.setString("ClerkManagementName", userManagementName);
-              await prefs.setString("ClerkTypeName", userTypeName);
-              await prefs.setString("ClerkRankName", userRankName);
-              await prefs.setString("ClerkCategoryName", userCategoryName);
-              await prefs.setString("ClerkCoreStrengthName",userCoreStrengthName);
-              await prefs.setString("ClerkPresenceName", userPresenceName);
-              await prefs.setString("ClerkJobName", userJobName);
-              await prefs.setStringList("ClerkSubscriptions", []);
-
-              var token = await FirebaseMessaging.instance.getToken();
-              await FirebaseDatabase.instance.reference().child("Clerks").child(userPhone).child("ClerkToken").set(token);
-              await prefs.setString("ClerkToken", token??"");
-
-              showToast(
-                  message: "اهلا بيك \n $userName",
-                  length: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 3);
-
-              await getDepartmentManager(userManagementID);
-              finish(context, (managerID != userNumber) ? const HomeScreen() : const ManagerHomeScreen());
-              emit(ClerkLoginSuccessState());
             }
           }).catchError((error) {
             if (error.type == DioErrorType.response) {
@@ -126,7 +142,6 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
                   length: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.BOTTOM,
                   timeInSecForIosWeb: 3);
-
               emit(ClerkLoginNoUserState());
             } else {
               emit(ClerkLoginErrorState(error.toString()));

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:it_department/shared/constants.dart';
 import '../../shared/components.dart';
 import '../registration/screens/clerk_registration_screen.dart';
 import 'cubit/clerk_login_cubit.dart';
@@ -41,16 +42,7 @@ class ClerkLoginScreen extends StatelessWidget {
             timeInSecForIosWeb: 3,
           );
         }
-
-        if (state is ClerkLoginSuccessState) {
-          showToast(
-            message: 'تم تسجيل الدخول بنجاح',
-            length: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 3,
-          );
-        }
-      }, builder: (context, state) {
+        }, builder: (context, state) {
         var cubit = ClerkLoginCubit.get(context);
           return Directionality(
             textDirection: TextDirection.rtl,
@@ -75,7 +67,7 @@ class ClerkLoginScreen extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(
-                      left: 24.0, right: 24.0, top: 86.0, bottom: 64.0),
+                      left: 24.0, right: 24.0, top: 32.0, bottom: 32.0),
                   child: Stack(
                     children: [
                       Center(
@@ -125,16 +117,16 @@ class ClerkLoginScreen extends StatelessWidget {
                                       floatingLabelStyle:
                                           TextStyle(color: Colors.teal[700]),
                                       hintText: 'الرقم القومى / العسكرى',
-                                      hintStyle: const TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.teal,
+                                      hintStyle: TextStyle(
+                                          fontSize: 14,
+                                          color: teal,
                                           fontFamily: "Hamed",
                                           fontWeight: FontWeight.w500),
                                       fillColor: Colors.white,
                                       //alignLabelWithHint: true,
-                                      errorStyle: const TextStyle(
+                                      errorStyle: TextStyle(
                                           fontSize: 16,
-                                          color: Color(0xffBF9A35),
+                                          color: orangeColor,
                                           fontFamily: "Hamed",
                                           fontWeight: FontWeight.w500),
                                       floatingLabelBehavior:
@@ -142,14 +134,14 @@ class ClerkLoginScreen extends StatelessWidget {
                                       hintTextDirection: TextDirection.rtl,
                                       prefixIcon: Icon(
                                         IconlyBroken.profile,
-                                        color: Colors.teal[700],
+                                        color: teal700,
                                       ),
                                       border: const OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(32))),
                                     ),
                                     style: const TextStyle(
-                                        fontSize: 22,
+                                        fontSize: 16,
                                         color: Colors.teal,
                                         fontFamily: "Hamed",
                                         fontWeight: FontWeight.w500),
@@ -192,7 +184,7 @@ class ClerkLoginScreen extends StatelessWidget {
                                       floatingLabelStyle:
                                           TextStyle(color: Colors.teal[700]),
                                       errorStyle: const TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 14,
                                           color: Color(0xffBF9A35),
                                           fontFamily: "Hamed",
                                           fontWeight: FontWeight.w500),
@@ -200,7 +192,7 @@ class ClerkLoginScreen extends StatelessWidget {
                                       fillColor: Colors.white,
                                       hintText: 'كلمة السر',
                                       hintStyle: const TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 16,
                                           color: Colors.teal,
                                           fontFamily: "Hamed",
                                           fontWeight: FontWeight.w500),
@@ -227,7 +219,7 @@ class ClerkLoginScreen extends StatelessWidget {
                                               Radius.circular(32))),
                                     ),
                                     style: const TextStyle(
-                                        fontSize: 22,
+                                        fontSize: 16,
                                         color: Colors.teal,
                                         fontFamily: "Hamed",
                                         fontWeight: FontWeight.w500),

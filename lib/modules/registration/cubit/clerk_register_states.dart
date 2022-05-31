@@ -4,6 +4,8 @@ class ClerkRegisterInitialState extends ClerkRegisterStates{}
 
 class ClerkRegisterChangeImageState extends ClerkRegisterStates{}
 
+class ClerkRegisterClearListsState extends ClerkRegisterStates{}
+
 class ClerkRegisterChangePasswordVisibilityState extends ClerkRegisterStates{}
 
 class ClerkRegisterChangeCityBottomSheetState extends ClerkRegisterStates{}

@@ -90,7 +90,7 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
                   if(value.exists){
                     FirebaseFirestore.instance.collection("Clerks").doc(userNumber).get().then((value)async{
                       value.data()!.forEach((key, value) async {
-                        await prefs.setString("ClerkImage", value["ClerkImage"]!.toString());
+                        await prefs.setString("ClerkImage", value["ClerkImage"].toString());
                       });
                     });
 
@@ -132,7 +132,6 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
                         timeInSecForIosWeb: 3);
                   }
                   emit(ClerkLoginSuccessState());
-
               });
             }
           }).catchError((error) {

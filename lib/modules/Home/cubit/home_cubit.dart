@@ -417,7 +417,7 @@ class HomeCubit extends Cubit<HomeStates> {
           currentDeviceDepth = landPlot["Depth"].toString() !="null" ? landPlot["Depth"].toString() : "-";
           currentDeviceSalinity = landPlot["Salinity"].toString() !="null" ? landPlot["Salinity"].toString() : "-";
           currentDeviceDrainingWater = landPlot["Draining_Water"].toString() !="null" ? landPlot["Draining_Water"].toString() : "-";
-          currentDevicePumpCompany = landPlot["Company_Pumps"].toString() !="null" ? landPlot["Company_Pumps"].toString() : "-";
+          currentDevicePumpCompany = landPlot["Company_Pumps_Name"].toString() !="null" ? landPlot["Company_Pumps_Name"].toString() : "-";
           currentDevicePumpCapacity = landPlot["Pump_Capacity"].toString() !="null" ? landPlot["Pump_Capacity"].toString() : "-";
           currentDevicePumpPhases = landPlot["Phases_Pump"].toString() !="null" ? landPlot["Phases_Pump"].toString() : "-";
           currentDeviceDateDischarge = landPlot["Date_Discharge"].toString() !="null" ? formatDate(DateTime.parse(landPlot["Date_Discharge"].toString())) : "-";

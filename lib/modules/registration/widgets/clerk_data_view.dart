@@ -118,7 +118,7 @@ class ClerkDataWidget extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.18),
-          child: Text("اسم الموظف", style: TextStyle(color: orangeColor, fontSize: 18, fontFamily: "Hamed"),),
+          child: Text("الاسم", style: TextStyle(color: orangeColor, fontSize: 18, fontFamily: "Hamed"),),
         ),
         const SizedBox(height: 12,),
         Row(
@@ -376,7 +376,7 @@ class ClerkDataWidget extends StatelessWidget {
         const SizedBox(height: 12,),
         Padding(
           padding: EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.18),
-          child: Text("الدرجة", style: TextStyle(color: orangeColor, fontSize: 18, fontFamily: "Hamed"),),
+          child: Text("الفئة", style: TextStyle(color: orangeColor, fontSize: 18, fontFamily: "Hamed"),),
         ),
         const SizedBox(height: 12,),
         Row(

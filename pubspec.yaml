@@ -70,7 +70,7 @@ dependencies:
   open_file: ^3.2.1
   record: ^3.0.2
   just_audio: ^0.9.19
-  percent_indicator: ^4.0.0
+  percent_indicator: ^4.2.2
   galleryimage: ^1.1.0
   swipe: ^0.0.1
   transition_plus: 0.0.12

@@ -87,7 +87,7 @@ class ClerkLoginScreen extends StatelessWidget {
                                     keyboardType: TextInputType.number,
                                     validator: (String? value) {
                                       if (value!.isEmpty) {
-                                        return 'يجب ادخال الرقم القومى / العسكرى !';
+                                        return 'يجب ادخال اسم المستخدم !';
                                       }
                                       return null;
                                     },
@@ -116,7 +116,7 @@ class ClerkLoginScreen extends StatelessWidget {
                                       ),
                                       floatingLabelStyle:
                                           TextStyle(color: Colors.teal[700]),
-                                      hintText: 'الرقم القومى / العسكرى',
+                                      hintText: 'اسم المستخدم',
                                       hintStyle: TextStyle(
                                           fontSize: 14,
                                           color: teal,

@@ -12,7 +12,6 @@ import 'package:transition_plus/transition_plus.dart';
 
 import '../../../../network/remote/dio_helper.dart';
 import '../../Login/clerk_login_screen.dart';
-import '../../Manager/screens/manager_home_screen.dart';
 
 class SplashCubit extends Cubit<SplashStates> {
   SplashCubit() : super(SplashInitialState());
@@ -27,9 +26,8 @@ class SplashCubit extends Cubit<SplashStates> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     if(prefs.getString("ClerkID") != null){
-
       await getDepartmentManager(prefs.getString("ClerkManagementID")!.toString());
-      finish(context, (managerID != prefs.getString("ClerkNumber")!.toString()) ? const HomeScreen() : const ManagerHomeScreen());
+      finish(context, (managerID != prefs.getString("ClerkNumber")!.toString()) ? const HomeScreen() : const HomeScreen());
     }else{
       finish(context, ClerkLoginScreen());
     }

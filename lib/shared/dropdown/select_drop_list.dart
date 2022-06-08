@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:it_department/shared/components.dart';
+import 'package:it_department/shared/constants.dart';
 
 import 'drop_list_model.dart';
 
 class SelectDropList extends StatefulWidget {
   final OptionItem itemSelected;
   final DropListModel? dropListModel;
-  final IconData listIcon;
+  final IconData? listIcon;
   final Function(OptionItem optionItem) onOptionSelected;
 
   // ignore: use_key_in_widget_constructors
@@ -66,11 +69,16 @@ class _SelectDropListState extends State<SelectDropList>
           height: MediaQuery.of(context).size.height * 0.06,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(8),
+                topLeft: Radius.circular(8),
+                bottomRight: isShow ? Radius.circular(0) : Radius.circular(8),
+                bottomLeft: isShow ? Radius.circular(0) : Radius.circular(8),
+            ),
             color: Colors.white,
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                  blurRadius: 10, color: Colors.black26, offset: Offset(0, 2))
+                  blurRadius: 10, color: darkGreen, offset: Offset(0, 2))
             ],
           ),
           child: GestureDetector(
@@ -83,24 +91,25 @@ class _SelectDropListState extends State<SelectDropList>
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                 Icon(
+                const SizedBox(width: 8,),
+                widget.listIcon != null ? Icon(
                   widget.listIcon,
-                  color: Colors.teal[700],
-                ),
-                const SizedBox(
+                  color: lightGreen,
+                ) : getEmptyWidget(),
+                widget.listIcon != null ? const SizedBox(
                   width: 10,
-                ),
+                ) : getEmptyWidget(),
                 Expanded(
                     child: Text(
                       optionItemSelected.title,
-                      style:  TextStyle(color: Colors.teal[700], fontSize: 16),
+                      style:  TextStyle(color: lightGreen, fontFamily: "Hamed", fontSize: 20,),
                     )),
                 Align(
                   alignment: const Alignment(1, 0),
                   child: Icon(
-                    isShow ? Icons.arrow_drop_down : Icons.arrow_right,
-                    color:  Colors.teal[700],
-                    size: 15,
+                    !isShow ? IconlyBroken.arrowDown2 : IconlyBroken.arrowUp2,
+                    color:  lightGreen,
+                    size: 25,
                   ),
                 ),
               ],
@@ -116,18 +125,18 @@ class _SelectDropListState extends State<SelectDropList>
               ),
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.only(bottom: 10),
-                decoration:  const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
+                decoration:  BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(0),
+                      topRight: Radius.circular(0),
                       bottomLeft: Radius.circular(8),
                       bottomRight: Radius.circular(8)),
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
                         blurRadius: 4,
-                        color: Colors.black26,
-                        offset: Offset(0, 4))
+                        color: darkGreen,
+                        offset: const Offset(0, 4))
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -156,16 +165,16 @@ class _SelectDropListState extends State<SelectDropList>
               flex: 1,
               child: Container(
                 padding: const EdgeInsets.only(top: 20),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: Colors.grey, width: 1)),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: lightGreen, width: 0.5)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(right: 12.0),
                   child: Text(item.title,
                       style:  TextStyle(
-                          color: Colors.teal[700],
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14),
+                          color: lightGreen,
+                          fontFamily: "Hamed",
+                          fontSize: 18),
                       maxLines: 3,
                       textAlign: TextAlign.start,
                       overflow: TextOverflow.ellipsis),

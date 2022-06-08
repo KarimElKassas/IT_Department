@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
    <application
-        android:label="IT Department"
+        android:label="Future Of Egypt"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
        <activity

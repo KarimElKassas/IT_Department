@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:it_department/modules/Chat/screens/display_chats_screen.dart';
+import 'package:it_department/modules/Core/screens/core_details_screen.dart';
 import 'package:it_department/modules/Core/screens/core_screen.dart';
 import 'package:it_department/modules/Home/screens/home_screen.dart';
 import 'package:it_department/modules/Login/clerk_login_screen.dart';
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'IT Department',
+      title: 'Future Of Egypt',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
       ),

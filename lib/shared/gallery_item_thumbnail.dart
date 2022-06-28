@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:image_picker/image_picker.dart';
 
-// to show image in Row
 class GalleryThumbnail extends StatelessWidget {
   const GalleryThumbnail({Key? key, required this.galleryItem, this.onTap})
       : super(key: key);

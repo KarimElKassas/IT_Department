@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 
+import 'constants.dart';
+
 class MyBlocObserver extends BlocObserver {
   @override
   void onCreate(BlocBase bloc) {
@@ -22,6 +24,9 @@ class MyBlocObserver extends BlocObserver {
   @override
   void onClose(BlocBase bloc) {
     super.onClose(bloc);
+    if(bloc.runtimeType.toString() == "ConversationCubit"){
+      messageControllerValue.value = "";
+    }
     print('onClose -- ${bloc.runtimeType}');
   }
 }

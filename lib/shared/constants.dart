@@ -18,3 +18,14 @@ final messageControllerValue = ValueNotifier<String>("");
 final startedRecordValue = ValueNotifier<bool>(false);
 final lastMessageValue = ValueNotifier<String>("");
 final lastMessageTimeValue = ValueNotifier<String>("");
+
+Duration stringToDuration(String format){
+  var parts = format.split(':');
+  var minutes = parts[0].trim();
+  var seconds = parts[1].trim();
+
+  int totalSeconds = (int.parse(minutes) * 60) + int.parse(seconds);
+
+  return Duration(seconds: totalSeconds);
+}
+String urlint = '';

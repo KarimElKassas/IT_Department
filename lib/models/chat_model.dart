@@ -9,7 +9,7 @@ class ChatModel {
   Timestamp? createdAt;
   String type = "";
   int imagesCount = 0;
-  int recordDuration = 0;
+  String recordDuration = "0";
   String fileSize = "0 KB";
   String fileName = "";
   bool isSeen = false;

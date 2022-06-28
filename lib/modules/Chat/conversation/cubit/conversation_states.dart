@@ -96,3 +96,6 @@ class ConversationDownloadFileErrorState extends ConversationStates{
   ConversationDownloadFileErrorState(this.error);
 
 }
+class ConversationChangeOpacity extends ConversationStates{}
+class ConversationChangeButtonPosition extends ConversationStates{}
+class ConversationEndRecord extends ConversationStates{}

@@ -1,14 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:it_department/modules/Chat/screens/display_chats_screen.dart';
-import 'package:it_department/modules/Core/screens/core_details_screen.dart';
-import 'package:it_department/modules/Core/screens/core_screen.dart';
-import 'package:it_department/modules/Home/screens/home_screen.dart';
 import 'package:it_department/modules/Login/clerk_login_screen.dart';
 import 'package:it_department/modules/SplashScreen/splash_screen.dart';
-import 'package:it_department/modules/registration/widgets/clerk_data_view.dart';
 import 'package:it_department/shared/bloc_observer.dart';
+import 'package:sizer/sizer.dart' as res;
 
 import 'network/local/cache_helper.dart';
 import 'network/remote/dio_helper.dart';
@@ -32,12 +28,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Future Of Egypt',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-      ),
-      home:  CoreScreen(),
+    return res.Sizer(
+      builder: (context, orientation, deviceType){
+        return MaterialApp(
+            title: 'Future Of Egypt',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+            ),
+            home: SplashScreen(),
+        );
+      },
     );
+  }
+}
+class ResponsiveApp {
+  static MediaQueryData? _mediaQueryData;
+
+  MediaQueryData get mq => _mediaQueryData!;
+
+  static void setMq(BuildContext context) {
+    _mediaQueryData = MediaQuery.of(context);
   }
 }

@@ -36,6 +36,7 @@ class _GalleryImageWrapperState extends State<GalleryImageWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         title: Text(""),
         toolbarHeight: 0,
@@ -54,6 +55,7 @@ class _GalleryImageWrapperState extends State<GalleryImageWrapper> {
           height: MediaQuery.of(context).size.height,
         ),
         child: PhotoViewGallery.builder(
+          enableRotation: true,
           scrollPhysics: const BouncingScrollPhysics(),
           builder: _buildImage,
           itemCount: widget.galleryItems.length,

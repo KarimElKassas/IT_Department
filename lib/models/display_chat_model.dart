@@ -1,6 +1,9 @@
 class DisplayChatModel {
 
   String userID = "";
+  String userName = "";
+  String userImage = "";
+  String userToken = "";
   String chatID = "";
   String lastMessage = "";
   String lastMessageType = "";
@@ -9,6 +12,6 @@ class DisplayChatModel {
   String unreadMessagesCount = "";
   String partnerState = "";
 
-  DisplayChatModel(this.userID, this.chatID, this.lastMessage, this.lastMessageTime, this.lastMessageType, this.lastMessageSender, this.unreadMessagesCount, this.partnerState);
+  DisplayChatModel(this.userID, this.userName, this.userImage, this.userToken, this.chatID, this.lastMessage, this.lastMessageTime, this.lastMessageType, this.lastMessageSender, this.unreadMessagesCount, this.partnerState);
 
 }

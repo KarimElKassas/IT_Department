@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:it_department/modules/Chat/widget/chat_UI.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../shared/components.dart';
 import '../../../shared/constants.dart';
-import '../cubit/conversation_cubit.dart';
-import '../cubit/conversation_states.dart';
+import '../conversation/cubit/conversation_cubit.dart';
+import '../conversation/cubit/conversation_states.dart';
 
 class InputFieldWidget extends StatefulWidget {
 
@@ -14,8 +16,9 @@ class InputFieldWidget extends StatefulWidget {
   final String chatID;
   final String userName;
   final String userToken;
+  final String userImage;
 
-  const InputFieldWidget({Key? key, required this.userID, required this.chatID, required this.userName, required this.userToken}) : super(key: key);
+  const InputFieldWidget({Key? key, required this.userID, required this.chatID, required this.userName, required this.userToken, required this.userImage}) : super(key: key);
 
   @override
   State<InputFieldWidget> createState() => _InputFieldWidgetState();
@@ -43,6 +46,80 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
             color: Colors.transparent,
             child: Row(
               children: [
+                Expanded(
+                  child:  !cubit.isRecording ?
+                  Container(
+                      padding: const EdgeInsets.only(
+                        left: 4,
+                        right: 24,
+                      ),
+                      decoration: BoxDecoration(
+                        color: white,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: messageController,
+                              keyboardType: TextInputType.multiline,
+                              textInputAction: TextInputAction.newline,
+                              textDirection: TextDirection.rtl,
+                              style: TextStyle(
+                                  color: lightGreen, fontFamily: "Questv", fontSize: 14),
+                              maxLines: 3,
+                              minLines: 1,
+                              decoration: InputDecoration(
+                                hintText: "رسالتك ... ",
+                                hintStyle:
+                                TextStyle(color: lightGreen, fontFamily: "Questv", fontSize: 14),
+                                hintTextDirection: TextDirection.rtl,
+                                border: InputBorder.none,
+                              ),
+
+                              onChanged: (String value) {
+
+                                messageControllerValue.value = value.toString();
+
+                                if (value.isEmpty || value.characters.isEmpty) {
+                                  print("FIRST CASE\n");
+                                  cubit.changeUserState("1", widget.userID);
+                                }else{
+                                  print("SECOND CASE\n");
+                                  cubit.changeUserState("2", widget.userID);
+                                }
+                              },
+                              onEditingComplete: () {
+                                cubit.changeUserState("1", widget.userID);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          IconButton(
+                            onPressed: () {
+                              cubit.selectFile(widget.userID, widget.chatID);
+                            },
+                            icon: Icon(IconlyBroken.paperUpload,
+                                color: lightGreen),
+                            iconSize: 25,
+                            constraints: const BoxConstraints(maxWidth: 25),
+                          ),
+                          const SizedBox(width: 6),
+                          IconButton(
+                            onPressed: () {
+                              cubit.selectImages(context, widget.userID, widget.userToken, widget.userName, widget.userImage, widget.chatID);
+                            },
+                            icon: Icon(IconlyBroken.camera,
+                                color: lightGreen),
+                            iconSize: 25,
+                            constraints: const BoxConstraints(maxWidth: 25),
+                          ),
+                        ],
+                      ),
+                    ) :
+                  Center(child: buildRecordingHolder(cubit)),
+                ),
+                const SizedBox(width: 8),
                 ValueListenableBuilder(
                   valueListenable: messageControllerValue,
                   builder: (context, value, state){
@@ -74,7 +151,8 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
                                     messageController.text.toString(),
                                     "Text",
                                     false,
-                                    widget.userToken);
+                                    widget.userToken,
+                                    messageController);
                                 messageController.text = "";
                                 messageControllerValue.value = "";
                               }
@@ -103,7 +181,7 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
                           if (value == true) {
                             return InkWell(
                               onTap: ()async {
-                                await cubit.stopRecord(widget.userID);
+                                await cubit.stopRecord(widget.userID, widget.chatID);
                               },
                               child: SizedBox(
                                 height: 45,
@@ -145,81 +223,7 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
                       );
                     }
                   },
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child:  !cubit.isRecording ?
-                  Container(
-                      padding: const EdgeInsets.only(
-                        left: 4,
-                        right: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: white,
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              cubit.selectFile(widget.userID, widget.chatID);
-                            },
-                            icon: Icon(IconlyBroken.paperUpload,
-                                color: lightGreen),
-                            iconSize: 25,
-                            constraints: const BoxConstraints(maxWidth: 25),
-                          ),
-                          const SizedBox(width: 5),
-                          IconButton(
-                            onPressed: () {
-                              cubit.selectImages(context, widget.userID, widget.chatID);
-                            },
-                            icon: Icon(IconlyBroken.camera,
-                                color: lightGreen),
-                            iconSize: 25,
-                            constraints: const BoxConstraints(maxWidth: 25),
-                          ),
-                          const SizedBox(width: 5),
-                          Expanded(
-                            child: TextFormField(
-                              controller: messageController,
-                              keyboardType: TextInputType.multiline,
-                              textInputAction: TextInputAction.newline,
-                              textDirection: TextDirection.rtl,
-                              style: TextStyle(
-                                  color: lightGreen, fontFamily: "Questv", fontSize: 14),
-                              maxLines: 3,
-                              minLines: 1,
-                              decoration: InputDecoration(
-                                hintText: "رسالتك ... ",
-                                hintStyle:
-                                TextStyle(color: lightGreen, fontFamily: "Questv", fontSize: 14),
-                                hintTextDirection: TextDirection.rtl,
-                                border: InputBorder.none,
-                              ),
-
-                              onChanged: (String value) {
-
-                                messageControllerValue.value = value.toString();
-
-                                if (value.isEmpty || value.characters.isEmpty) {
-                                  print("FIRST CASE\n");
-                                  cubit.changeUserState("1", widget.userID);
-                                }else{
-                                  print("SECOND CASE\n");
-                                  cubit.changeUserState("2", widget.userID);
-                                }
-                              },
-                              onEditingComplete: () {
-                                cubit.changeUserState("1", widget.userID);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ) :
-                  Center(child: buildRecordingHolder(cubit)),
-                ),
+                )
               ],
             ),
           ),

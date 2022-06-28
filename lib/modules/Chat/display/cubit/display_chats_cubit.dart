@@ -8,9 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transition_plus/transition_plus.dart';
 
-import '../../../models/chat_model.dart';
-import '../../../models/display_chat_model.dart';
-import '../../../models/firebase_clerk_model.dart';
+import '../../../../models/chat_model.dart';
+import '../../../../models/display_chat_model.dart';
+import '../../../../models/firebase_clerk_model.dart';
+import '../../conversation/screens/conversation_screen.dart';
 import 'display_chats_states.dart';
 
 class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
@@ -26,6 +27,7 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
   List<ClerkFirebaseModel> clerkList = [];
   List<ClerkFirebaseModel> filteredClerkList = [];
   List<DisplayChatModel> chatList = [];
+  List<DisplayChatModel> filteredChatList = [];
   List<ChatModel> messagesList = [];
 
   String lastMessage = "";
@@ -34,7 +36,7 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
   String lastMessageTimeText = "";
   String chatID = "";
 
-  Future<void> createChatList(BuildContext context, String receiverID)async {
+  Future<void> createChatList(BuildContext context, String receiverID, String receiverName, String receiverImage, String receiverToken)async {
     emit(DisplayChatsLoadingCreateChatState());
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await FirebaseFirestore.instance.collection("ChatList").doc(prefs.getString("ClerkID")).collection("Chats").doc(receiverID).get().then((value){
@@ -45,6 +47,9 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
         chatID = Random().nextInt(10000).toString();
         Map<String, dynamic> chatListMap = HashMap();
         chatListMap['ReceiverID'] = receiverID;
+        chatListMap['ReceiverName'] = receiverName;
+        chatListMap['ReceiverImage'] = receiverImage;
+        chatListMap['ReceiverToken'] = receiverToken;
         chatListMap['ChatID'] = chatID;
         chatListMap['LastMessage'] = "";
         chatListMap['LastMessageType'] = "";
@@ -72,12 +77,12 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
       chatList.clear();
       clerkList.clear();
       filteredClerkList.clear();
+      filteredChatList.clear();
       for (var element in event.docs) {
         if(element.exists){
-
           Map data = element.data();
           print("DATA ::: $data\n");
-          displayChatModel = DisplayChatModel(data["ReceiverID"].toString(),data["ChatID"].toString(),data["LastMessage"].toString(),data["LastMessageTime"].toString(),data["LastMessageType"].toString(),data["LastMessageSender"].toString(),data["UnReadMessagesCount"].toString(),data["PartnerState"].toString());
+          displayChatModel = DisplayChatModel(data["ReceiverID"].toString(),data["ReceiverName"].toString(), data["ReceiverImage"].toString(), data["ReceiverToken"].toString(),data["ChatID"].toString(),data["LastMessage"].toString(),data["LastMessageTime"].toString(),data["LastMessageType"].toString(),data["LastMessageSender"].toString(),data["UnReadMessagesCount"].toString(),data["PartnerState"].toString());
           await FirebaseFirestore.instance.collection("Clerks").doc(data["ReceiverID"]).get().then((value){
             if(value.exists){
               Map clerk = value.data()!;
@@ -101,6 +106,7 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
             }
           });
           chatList.add(displayChatModel!);
+          filteredChatList = chatList.toList();
         }
       }
       print("Chat List Length : ${chatList.length}\n");
@@ -108,13 +114,39 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
       emit(DisplayChatsGetChatsState());
     });
   }
+  Future<void> getUserData(BuildContext context, String userID, String chatID) async {
+    emit(DisplayChatsLoadingUserDataState());
+
+    FirebaseFirestore.instance.collection("Clerks").doc(userID).get().then((value)async {
+      if(value.exists){
+        Map data = value.data()!;
+        print("USER NAME : ${data["ClerkName"]} \n");
+        Navigator.push(context, ScaleTransition1(page:
+        ConversationScreen(
+          userID: data["ClerkID"],
+          chatID: chatID,
+          userName: data["ClerkName"],
+          userImage: data["ClerkImage"],
+          userToken: data["ClerkToken"],
+          userJob: data["ClerkJobName"],
+          userCategory: data["ClerkCategoryName"],
+          userDepartment: data["ClerkManagementName"],
+          userPhone: data["ClerkPhone"],
+          userRank: data["ClerkRankName"],
+        ), startDuration: const Duration(milliseconds: 1500),closeDuration: const Duration(milliseconds: 800), type: ScaleTrasitionTypes.bottomRight));
+      }else{
+        print("USER DOESN'T EXIST \n");
+      }
+      emit(DisplayChatsGetUserDataState());
+    });
+  }
 
   void searchChat(String value){
-    filteredClerkList = clerkList
+    filteredChatList = chatList
         .where(
-            (user) => user.clerkName.toLowerCase().contains(value.toString()))
+            (user) => user.userName.toLowerCase().contains(value.toString()))
         .toList();
-    print("${filteredClerkList.length}\n");
+    print("${filteredChatList.length}\n");
     emit(DisplayChatsFilterChatsState());
 
   }

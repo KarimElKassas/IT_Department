@@ -65,6 +65,9 @@ class HomeCubit extends Cubit<HomeStates> {
   String currentDevicePumpCapacity = "";
   String currentDevicePumpPhases = "";
   String currentDeviceDateDischarge = "";
+  int columnsCount = 0;
+  int piecesCount = 0;
+  int devicesCount = 0;
 
   static String formatDate(DateTime date){
 
@@ -91,37 +94,39 @@ class HomeCubit extends Cubit<HomeStates> {
         query: {'Land_Plot_Level': 1}).then((value) async {
           if(value.statusMessage != "No LandPlot Found"){
             await value.data.forEach((landPlot) {
-              landPlotModel = LandPlotModel(
-                  landPlot["Land_Plot_ID"],
-                  landPlot["Land_Plot_Name"],
-                  landPlot["Land_Plot_FK"],
-                  landPlot["Land_Plot_Level"],
-                  landPlot["Implementing_Company"],
-                  landPlot["Depth"],
-                  landPlot["U_Water"],
-                  landPlot["Water_Column"],
-                  landPlot["Draining_Water"],
-                  landPlot["Salinity"],
-                  landPlot["Pump_Capacity"],
-                  landPlot["Phases_Pump"],
-                  landPlot["Company_Pumps"],
-                  landPlot["Date_Discharge"],
-                  landPlot["Device_Type"],
-                  landPlot["Device_Towers"],
-                  landPlot["Device_Planes"],
-                  landPlot["Device_Space_Total"],
-                  landPlot["Maintenance_Agent"],
-                  landPlot["Device_Category"],
-                  landPlot["Land_Plot_Rec_Modifay"],
-                  landPlot["Device_Space_Valid"],
-                  landPlot["Device_Space_NotValid"],
-                  landPlot["Device_Space_NotValid_Reason"],
-                  landPlot["Land_Plot_Notes"],
-                  landPlot["Land_Plot_Latitude"],
-                  landPlot["Land_Plot__Longitude"]);
-              landPlotsList.add(landPlotModel!);
-              landPlotOptionList.add(OptionItem(
-                  id: landPlot["Land_Plot_ID"], title: landPlot["Land_Plot_Name"]));
+              if(!landPlot["Land_Plot_Name"].toString().contains("مراكز")){
+                landPlotModel = LandPlotModel(
+                    landPlot["Land_Plot_ID"],
+                    landPlot["Land_Plot_Name"],
+                    landPlot["Land_Plot_FK"],
+                    landPlot["Land_Plot_Level"],
+                    landPlot["Implementing_Company"],
+                    landPlot["Depth"],
+                    landPlot["U_Water"],
+                    landPlot["Water_Column"],
+                    landPlot["Draining_Water"],
+                    landPlot["Salinity"],
+                    landPlot["Pump_Capacity"],
+                    landPlot["Phases_Pump"],
+                    landPlot["Company_Pumps"],
+                    landPlot["Date_Discharge"],
+                    landPlot["Device_Type"],
+                    landPlot["Device_Towers"],
+                    landPlot["Device_Planes"],
+                    landPlot["Device_Space_Total"],
+                    landPlot["Maintenance_Agent"],
+                    landPlot["Device_Category"],
+                    landPlot["Land_Plot_Rec_Modifay"],
+                    landPlot["Device_Space_Valid"],
+                    landPlot["Device_Space_NotValid"],
+                    landPlot["Device_Space_NotValid_Reason"],
+                    landPlot["Land_Plot_Notes"],
+                    landPlot["Land_Plot_Latitude"],
+                    landPlot["Land_Plot__Longitude"]);
+                landPlotsList.add(landPlotModel!);
+                landPlotOptionList.add(OptionItem(
+                    id: landPlot["Land_Plot_ID"], title: landPlot["Land_Plot_Name"]));
+              }
             });
             landPlotDropListModel = DropListModel(landPlotOptionList);
             zeroLandPlots = false;
@@ -145,6 +150,7 @@ class HomeCubit extends Cubit<HomeStates> {
       }
     });
   }
+
   Future<void> getLandPlotColumns(int landPlotID) async {
     emit(HomeLoadingLandColumnsState());
     landPlotColumnsList = [];
@@ -220,6 +226,43 @@ class HomeCubit extends Cubit<HomeStates> {
       }
     });
   }
+  Future<void> getLandPlotPiecesCount(int landID) async {
+    emit(HomeLoadingLandColumnsState());
+    landPlotPiecesList = [];
+    landPlotPiecesDropListModel?.listOptionItems.clear();
+    landPlotPiecesDropListModel = null;
+    gotLandPlotPieces = false;
+    gotLandPlotDevices = false;
+    await DioHelper.getData(
+        url: 'landPlot/LandPlotGetWithLevelAndFK',
+        query: {
+          'Land_Plot_Level': 3,
+          'Land_Plot_FK': landID
+        }).then((value) async {
+      if(value.statusMessage != "No LandPlot Found"){
+        value.data.forEach((element) {
+          piecesCount++;
+        });
+      }else{
+        piecesCount = 0;
+      }
+      emit(HomeGetLandPiecesSuccessState());
+    }).catchError((error) {
+      if (error is DioError) {
+        gotLandPlotPieces = false;
+        gotLandPlotDevices = false;
+        zeroPieces = true;
+        emit(HomeGetLandPiecesErrorState("لقد حدث خطأ ما برجاء المحاولة لاحقاً"));
+      } else {
+        gotLandPlotPieces = false;
+        gotLandPlotDevices = false;
+        zeroPieces = true;
+        print(error.toString());
+        emit(HomeGetLandPiecesErrorState(error.toString()));
+      }
+    });
+  }
+
   Future<void> getLandPlotPieces(int landPlotColumnID) async {
     emit(HomeLoadingLandColumnsState());
     landPlotPiecesList = [];

@@ -89,9 +89,8 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
               FirebaseFirestore.instance.collection("Clerks").doc(userNumber).get().then((value) async {
                   if(value.exists){
                     FirebaseFirestore.instance.collection("Clerks").doc(userNumber).get().then((value)async{
-                      value.data()!.forEach((key, value) async {
-                        await prefs.setString("ClerkImage", value["ClerkImage"].toString());
-                      });
+                      Map data = value.data()!;
+                      await prefs.setString("ClerkImage", data["ClerkImage"].toString());
                     });
 
                     await prefs.setString("ClerkID", userID);

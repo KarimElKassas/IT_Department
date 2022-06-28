@@ -16,15 +16,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:it_department/modules/Chat/widget/page_manager.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../models/chat_model.dart';
-import '../../../shared/components.dart';
-import '../../../shared/constants.dart';
-import '../../../shared/gallery_item_model.dart';
+import '../../../../models/chat_model.dart';
+import '../../../../shared/components.dart';
+import '../../../../shared/constants.dart';
+import '../../../../shared/gallery_item_model.dart';
 import '../screens/selected_images_screen.dart';
 import 'conversation_states.dart';
 
@@ -32,6 +33,18 @@ class ConversationCubit extends Cubit<ConversationStates> {
   ConversationCubit() : super(ConversationInitialState());
 
   static ConversationCubit get(context) => BlocProvider.of(context);
+
+  //********* RECORD UI ***********
+  double opacity = 1.0;
+  double dX = 0.0;
+  double dY = 0.0;
+  double recordButtonSize = 50;
+  double limit = 150;
+  bool recording = false;
+  Color recordButtonMicColor = Colors.white;
+  bool movable = false;
+  bool lockedRecord = false;
+  //*******************************
 
   String userID = "";
   String userName = "";
@@ -85,6 +98,105 @@ class ConversationCubit extends Cubit<ConversationStates> {
   List<GalleryModel> galleryItemModelList = [];
   List<dynamic>? imageFileList = [];
   String chatID = "";
+  String receiverID = "";
+  String receiverName = "";
+  String receiverImage = "";
+  String receiverToken = "";
+  PageManager? pageManager;
+
+  void initPageManager(){
+  pageManager = PageManager();
+  }
+  void getChatData(String userID, String userName, String userImage, String userToken, String chat){
+    receiverID = userID;
+    receiverName = userName;
+    receiverImage = userImage;
+    receiverToken = userToken;
+    chatID = chat;
+  }
+  changeOpacity() {
+    if(lockedRecord){
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        opacity = opacity == 0.0 ? 1.0 : 0.0;
+        changeOpacity();
+      });
+      emit(ConversationChangeOpacity());
+    }
+  }
+
+  void sendRecord() {
+    recording = false;
+    lockedRecord = false;
+    stopRecord(receiverID, chatID);
+    emit(ConversationEndRecord());
+  }
+
+  void deleteRecord() {
+    recording = false;
+    lockedRecord = false;
+    timer?.cancel();
+    emit(ConversationEndRecord());
+  }
+
+  onLongPressStart(details) {
+    startRecord();
+  }
+  onLongPressUpdating(LongPressMoveUpdateDetails details) {
+    if (recording && details.offsetFromOrigin.dx <= 0 && dY <= 7) {
+      if (movable && details.offsetFromOrigin.dx > -limit) {
+          dX = details.offsetFromOrigin.dx * -1;
+          dY = 0;
+          emit(ConversationChangeButtonPosition());
+      } else {
+        deleteRecord();
+          recordButtonSize = 50;
+          recordButtonMicColor = Colors.white;
+          recording = false;
+          dX = 0;
+          dY = 0;
+          movable = false;
+        emit(ConversationChangeButtonPosition());
+      }
+    }
+    if (recording && details.offsetFromOrigin.dy <= 0 && dX <= 7) {
+      if (movable && details.offsetFromOrigin.dy > -limit) {
+          dY = details.offsetFromOrigin.dy * -1;
+          dX = 0;
+          emit(ConversationChangeButtonPosition());
+      } else {
+          lockedRecord = true;
+          recordButtonSize = 50;
+          recordButtonMicColor = Colors.white;
+          dX = 0;
+          dY = 0;
+          movable = false;
+          emit(ConversationChangeButtonPosition());
+      }
+    }
+  }
+
+  onLongPressEnd(details) {
+    if (!lockedRecord && dY < (limit - (recordButtonSize / 2))) {
+      if (dX >= (limit - (recordButtonSize / 2))) {
+        deleteRecord();
+        recording = false;
+        emit(ConversationEndRecord());
+      } else if (recording) {
+        sendRecord();
+          recording = false;
+        emit(ConversationEndRecord());
+      }
+    } else {
+        lockedRecord = true;
+        emit(ConversationEndRecord());
+    }
+      movable = false;
+      recordButtonSize = 50;
+      recordButtonMicColor = Colors.white;
+      dX = 0;
+      dY = 0;
+      emit(ConversationEndRecord());
+  }
 
   void navigate(BuildContext context, route) {
     navigateTo(context, route);
@@ -120,13 +232,20 @@ class ConversationCubit extends Cubit<ConversationStates> {
   }
 
   void sendFireStoreMessage(String receiverID, String chatID, String message,
-      String type, bool isSeen, String userToken) async {
+      String type, bool isSeen, String userToken, TextEditingController messageController) async {
     DateTime now = DateTime.now();
     String currentTime = DateFormat("hh:mm a").format(now);
     String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
 
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
+
+    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
+    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
+
+    messageControllerValue.value = "";
+    messageController.clear();
 
     Map<String, dynamic> dataMap = HashMap();
     dataMap['SenderID'] = prefs.getString('ClerkID');
@@ -141,15 +260,30 @@ class ConversationCubit extends Cubit<ConversationStates> {
     dataMap["hasImages"] = false;
     dataMap["createdAt"] = Timestamp.now();
     dataMap["imagesCount"] = 0;
-    dataMap["recordDuration"] = 0;
+    dataMap["recordDuration"] = "0";
     dataMap["fileSize"] = "0 KB";
 
     Map<String, dynamic> chatListMap = HashMap();
     chatListMap['ReceiverID'] = receiverID;
+    chatListMap['ReceiverName'] = receiverName;
+    chatListMap['ReceiverImage'] = receiverImage;
+    chatListMap['ReceiverToken'] = receiverToken;
     chatListMap['LastMessage'] = message;
     chatListMap['LastMessageType'] = type;
     chatListMap['LastMessageTime'] = currentTime;
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
+
+    Map<String, dynamic> chatListMap2 = HashMap();
+    chatListMap2['ReceiverID'] = userID;
+    chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
+    chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
+    chatListMap2["ReceiverToken"] = receiverToken;
+    chatListMap2['LastMessage'] = message;
+    chatListMap2['LastMessageType'] = type;
+    chatListMap2['LastMessageTime'] = currentTime;
+    chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
+
+    print("Clerk Image : ${prefs.getString("ClerkImage")}\n");
 
     FirebaseFirestore.instance
         .collection("Chats")
@@ -158,46 +292,11 @@ class ConversationCubit extends Cubit<ConversationStates> {
         .doc(currentFullTime)
         .set(dataMap)
         .then((value) async {
-      Map<String, dynamic> imageMap = HashMap();
-      imageMap["messageImages"] = ["emptyList"];
-
-      FirebaseFirestore.instance
-          .collection("Chats")
-          .doc(chatID)
-          .collection("Messages")
-          .doc(currentFullTime)
-          .collection("Images")
-          .doc(currentFullTime)
-          .set(imageMap);
 
       sendNotification(message, currentTime, userToken);
+      chatListRef.update(chatListMap);
+      chatListTwoRef.update(chatListMap2);
       emit(ConversationSendMessageState());
-      await FirebaseFirestore.instance
-          .collection("ChatList")
-          .doc(userID)
-          .collection('Chats')
-          .doc(receiverID)
-          .get()
-          .then((value) async {
-        if (value.exists) {
-          Map data = value.data()!;
-          print("Chat Exist with ID ${data["ChatID"]}\n");
-          chatID = data["ChatID"];
-          chatListMap['ChatID'] = chatID;
-          await FirebaseFirestore.instance
-              .collection("ChatList")
-              .doc(userID)
-              .collection('Chats')
-              .doc(receiverID)
-              .update(chatListMap);
-          await FirebaseFirestore.instance
-              .collection("ChatList")
-              .doc(receiverID)
-              .collection('Chats')
-              .doc(userID)
-              .update(chatListMap);
-        }
-      });
     });
   }
 
@@ -209,8 +308,10 @@ class ConversationCubit extends Cubit<ConversationStates> {
     String currentTime = DateFormat("hh:mm a").format(now);
     String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
 
-    var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child(currentFullTime);
+    var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child("Documents");
     var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages");
+    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
+    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
@@ -228,7 +329,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     dataMap["hasImages"] = false;
     dataMap["createdAt"] = Timestamp.now();
     dataMap["imagesCount"] = 0;
-    dataMap["recordDuration"] = 0;
+    dataMap["recordDuration"] = "0";
 
     if(file.files.first.size > 1000000){
       dataMap["fileSize"] = "${(file.files.first.size * 0.000001).toStringAsFixed(2)} MB";
@@ -238,11 +339,23 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
     Map<String, dynamic> chatListMap = HashMap();
     chatListMap['ReceiverID'] = receiverID;
+    chatListMap['ReceiverName'] = receiverName;
+    chatListMap['ReceiverImage'] = receiverImage;
+    chatListMap['ReceiverToken'] = receiverToken;
     chatListMap['LastMessage'] = file.files.last;
     chatListMap['LastMessageType'] = "file";
     chatListMap['LastMessageTime'] = currentTime;
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
 
+    Map<String, dynamic> chatListMap2 = HashMap();
+    chatListMap2['ReceiverID'] = userID;
+    chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
+    chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
+    chatListMap2["ReceiverToken"] = receiverToken;
+    chatListMap2['LastMessage'] = file.files.last;
+    chatListMap2['LastMessageType'] = "file";
+    chatListMap2['LastMessageTime'] = currentTime;
+    chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
 
       ref.doc(currentFullTime).set(dataMap).then((value) async {
         uploadingFileName = currentFullTime;
@@ -250,13 +363,15 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
         File imageFile = File(fileName);
 
-        var uploadTask = storageRef.child(fileName).putFile(imageFile);
+        var uploadTask = storageRef.child(file.files.first.name).putFile(imageFile);
         await uploadTask.then((p0) {
           p0.ref.getDownloadURL().then((value) {
 
             dataMap['Message'] = value.toString();
 
             ref.doc(currentFullTime).update(dataMap).then((value){
+              chatListRef.update(chatListMap);
+              chatListTwoRef.update(chatListMap2);
               uploadingFileName = "";
               emit(ConversationSendFilesSuccessState());
             }).catchError((error){
@@ -281,7 +396,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
       });
   }
 
-  Future<void> uploadMultipleImagesFireStore(BuildContext context, String receiverID, String chatID) async{
+  Future<void> uploadMultipleImagesFireStore(BuildContext context, String message, String receiverID, String chatID, String messageType) async{
     emit(ConversationUploadingImagesState());
     DateTime now = DateTime.now();
     String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
@@ -299,7 +414,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
     Map<String, Object> dataMap = HashMap();
 
-    dataMap['Message'] = "صورة";
+    dataMap['Message'] = message;
     dataMap['ReceiverID'] = receiverID;
     dataMap['SenderID'] = userID;
     dataMap['fileName'] = "";
@@ -307,11 +422,11 @@ class ConversationCubit extends Cubit<ConversationStates> {
     dataMap["messageTime"] = currentTime;
     dataMap["messageFullTime"] = currentFullTime;
     dataMap["messageImages"] = ["emptyList"];
-    dataMap["type"] = "Image";
+    dataMap["type"] = messageType;
     dataMap["hasImages"] = true;
     dataMap["createdAt"] = Timestamp.now();
     dataMap["imagesCount"] = messageImagesStaticList!.length;
-    dataMap["recordDuration"] = 0;
+    dataMap["recordDuration"] = "0";
     dataMap["fileSize"] = "0 KB";
 
     for (int i = 0; i < messageImagesStaticList!.length; i++) {
@@ -337,13 +452,27 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
               Map<String, dynamic> chatListMap = HashMap();
               chatListMap['ReceiverID'] = receiverID;
-              chatListMap['LastMessage'] = "صورة";
-              chatListMap['LastMessageType'] = "Image";
+              chatListMap['ReceiverName'] = receiverName;
+              chatListMap['ReceiverImage'] = receiverImage;
+              chatListMap['ReceiverToken'] = receiverToken;
+              chatListMap['LastMessage'] = message;
+              chatListMap['LastMessageType'] = messageType;
               chatListMap['LastMessageTime'] = currentTime;
               chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
 
+              Map<String, dynamic> chatListMap2 = HashMap();
+              chatListMap2['ReceiverID'] = userID;
+              chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
+              chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
+              chatListMap2["ReceiverToken"] = receiverToken;
+              chatListMap2['LastMessage'] = message;
+              chatListMap2['LastMessageType'] = messageType;
+              chatListMap2['LastMessageTime'] = currentTime;
+              chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
+
+              print("Clerk Image : ${prefs.getString("ClerkImage")}\n");
               chatListRef.update(chatListMap);
-              chatListTwoRef.update(chatListMap);
+              chatListTwoRef.update(chatListMap2);
 
 
               emit(ConversationSendImagesSuccessState());
@@ -370,78 +499,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
     }
   }
 
-  Future<void> sendFileMessage(String type, String receiverID, bool isSeen,
-      FilePickerResult file) async {
-    emit(ConversationUploadingFileState(file.files.first.name));
-
-    DateTime now = DateTime.now();
-    String currentTime = DateFormat("hh:mm a").format(now);
-    String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
-
-    FirebaseDatabase database = FirebaseDatabase.instance;
-    var messagesRef = database.reference().child("Messages");
-    var storageRef = FirebaseStorage.instance
-        .ref("Messages")
-        .child(receiverID)
-        .child("Future Of Egypt")
-        .child(file.files.first.name);
-
-    Map<String, Object> dataMap = HashMap();
-    dataMap['SenderID'] = userID;
-    dataMap['ReceiverID'] = receiverID;
-    dataMap['type'] = type;
-    dataMap['Message'] = "";
-    dataMap["isSeen"] = isSeen;
-    dataMap["messageTime"] = currentTime;
-    dataMap["messageFullTime"] = currentFullTime;
-    dataMap["messageImages"] = "emptyList";
-    dataMap["hasImages"] = false;
-    dataMap["fileName"] = file.files.first.name;
-    dataMap["imagesCount"] = 0;
-
-    messagesRef.child(currentFullTime).set(dataMap).then((value) async {
-      File docFile = File(file.files.first.path!);
-      var uploadTask = storageRef.putFile(docFile);
-
-      await uploadTask.then((p0) {
-        p0.ref.getDownloadURL().then((value) {
-          dataMap["Message"] = value.toString();
-          messagesRef.child(currentFullTime).update(dataMap);
-        }).catchError((error) {
-          emit(ConversationSendMessageErrorState(error.toString()));
-        });
-      }).catchError((error) {
-        emit(ConversationSendMessageErrorState(error.toString()));
-      });
-
-      database
-          .reference()
-          .child("Clients")
-          .child(userID)
-          .child("ClientLastMessage")
-          .set(file.files.first.name)
-          .then((value) {
-        database
-            .reference()
-            .child("Clients")
-            .child(userID)
-            .child("ClientLastMessageTime")
-            .set(currentTime)
-            .then((value) {
-          database
-              .reference()
-              .child("Clients")
-              .child(userID)
-              .child("ClientState")
-              .set("متصل الان")
-              .then((value) {
-            emit(ConversationSendMessageState());
-          });
-        });
-      });
-    });
-  }
-
   void getFireStoreMessage(String receiverID, String chatID) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
@@ -464,7 +521,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
         for (var element in event.docs) {
           Map data = element.data();
-
           chatImagesModel = ChatImagesModel(data["messageFullTime"], (data["messageImages"] as List));
           chatImagesList.add(chatImagesModel!);
 
@@ -505,54 +561,8 @@ class ConversationCubit extends Cubit<ConversationStates> {
     emit(ConversationChangeUserState());
   }
 
-  void sendMessage(String receiverID, String message, String type, bool isSeen,
-      String userToken) {
-    DateTime now = DateTime.now();
-    String currentTime = DateFormat("hh:mm a").format(now);
-    String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
-
-    FirebaseDatabase database = FirebaseDatabase.instance;
-    var messagesRef = database.reference().child("Messages");
-
-    Map<String, Object> dataMap = HashMap();
-
-    dataMap['SenderID'] = userID;
-    dataMap['ReceiverID'] = receiverID;
-    dataMap['Message'] = message;
-    dataMap['type'] = type;
-    dataMap["isSeen"] = isSeen;
-    dataMap["messageTime"] = currentTime;
-    dataMap["messageFullTime"] = currentFullTime;
-    dataMap["messageImages"] = "emptyList";
-    dataMap["fileName"] = "";
-    dataMap["hasImages"] = false;
-
-    messagesRef.child(currentFullTime).set(dataMap).then((value) {
-      database
-          .reference()
-          .child("Clients")
-          .child(receiverID)
-          .child("ClientLastMessage")
-          .set(message)
-          .then((value) {
-        database
-            .reference()
-            .child("Clients")
-            .child(receiverID)
-            .child("ClientLastMessageTime")
-            .set(currentTime)
-            .then((value) {
-          sendNotification(message, currentTime, userToken);
-          emit(ConversationSendMessageState());
-        });
-      });
-    }).catchError((error) {
-      emit(ConversationSendMessageErrorState(error.toString()));
-    });
-  }
-
   void selectImages(
-      BuildContext context, String receiverID, String chatID) async {
+      BuildContext context, String receiverID, String receiverToken,String receiverName, String receiverImage, String chatID) async {
     final List<XFile>? selectedImages = await imagePicker.pickMultiImage();
     imageFileList = [];
 
@@ -566,6 +576,9 @@ class ConversationCubit extends Cubit<ConversationStates> {
           SelectedImagesScreen(
             chatImages: imageFileList,
             receiverID: receiverID,
+            receiverToken: receiverToken,
+            receiverName: receiverName,
+            receiverImage: receiverImage,
             chatID: chatID,
           ));
       emit(ConversationSelectImagesState());
@@ -596,165 +609,132 @@ class ConversationCubit extends Cubit<ConversationStates> {
     }
   }
 
+  String _formatNumber(int number) {
+    String numberStr = number.toString();
+    if (number < 10) {
+      numberStr = '0' + numberStr;
+    }
+    return numberStr;
+  }
+
   Future<void> sendAudioMessage(
-      String receiverID, String type, bool isSeen, File file) async {
+      String receiverID, String chatID, String type, bool isSeen, File file) async {
     DateTime now = DateTime.now();
     String currentTime = DateFormat("hh:mm a").format(now);
     String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
 
-    String fileName = audioPathStore;
+    var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child("Records").child(audioPathStore);
+    var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages");
 
-    FirebaseDatabase database = FirebaseDatabase.instance;
-    var messagesRef = database.reference().child("Messages");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userID = prefs.getString("ClerkID")!;
 
-    var storageRef = FirebaseStorage.instance
-        .ref("Messages")
-        .child(receiverID)
-        .child("Future Of Egypt")
-        .child(fileName);
+    File audioFile = File(file.path.toString());
+    final String minutes = _formatNumber(recordDuration ~/ 60);
+    final String seconds = _formatNumber(recordDuration % 60);
 
-    Map<String, Object> dataMap = HashMap();
-    dataMap['SenderID'] = userID;
+    Map<String, dynamic> dataMap = HashMap();
+    dataMap['SenderID'] = prefs.getString('ClerkID');
     dataMap['ReceiverID'] = receiverID;
-    dataMap['type'] = type;
     dataMap['Message'] = "";
+    dataMap['type'] = "audio";
     dataMap["isSeen"] = isSeen;
     dataMap["messageTime"] = currentTime;
     dataMap["messageFullTime"] = currentFullTime;
-    dataMap["messageImages"] = "emptyList";
+    dataMap["messageImages"] = ["emptyList"];
+    dataMap["fileName"] = audioPathStore;
     dataMap["hasImages"] = false;
-    dataMap["fileName"] = fileName;
+    dataMap["createdAt"] = Timestamp.now();
+    dataMap["imagesCount"] = 0;
+    dataMap["recordDuration"] = "$minutes : $seconds";
 
-    messagesRef.child(currentFullTime).set(dataMap).then((value) async {
-      emit(ConversationUploadingRecordState(fileName));
-      uploadingRecordName = fileName;
-      print("RECORD NAME UPLOADING : $uploadingRecordName \n");
+    if(audioFile.lengthSync() > 1000000){
+      dataMap["fileSize"] = "${(audioFile.lengthSync() * 0.000001).toStringAsFixed(2)} MB";
+    }else {
+      dataMap["fileSize"] = "${(audioFile.lengthSync() * 0.001).toStringAsFixed(2)} KB";
+    }
 
-      File audioFile = File(file.path.toString());
+    Map<String, dynamic> chatListMap = HashMap();
+    chatListMap['ReceiverID'] = receiverID;
+    chatListMap['ReceiverName'] = receiverName;
+    chatListMap['ReceiverImage'] = receiverImage;
+    chatListMap['ReceiverToken'] = receiverToken;
+    chatListMap['LastMessage'] = "ملف صوتى";
+    chatListMap['LastMessageType'] = "audio";
+    chatListMap['LastMessageTime'] = currentTime;
+    chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
+
+    Map<String, dynamic> chatListMap2 = HashMap();
+    chatListMap2['ReceiverID'] = userID;
+    chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
+    chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
+    chatListMap2["ReceiverToken"] = receiverToken;
+    chatListMap2['LastMessage'] = "ملف صوتى";
+    chatListMap2['LastMessageType'] = "audio";
+    chatListMap2['LastMessageTime'] = currentTime;
+    chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
+
+    ref.doc(currentFullTime).set(dataMap).then((value) async {
+      uploadingRecordName = currentFullTime;
 
       var uploadTask = storageRef.putFile(audioFile);
-      uploadTask.then((p0) {
+      await uploadTask.then((p0) {
         p0.ref.getDownloadURL().then((value) {
-          dataMap["Message"] = value.toString();
 
-          messagesRef
-              .child(currentFullTime)
-              .update(dataMap)
-              .then((realtimeDbValue) async {
+          dataMap['Message'] = value.toString();
+
+          ref.doc(currentFullTime).update(dataMap).then((value)async {
             uploadingRecordName = "";
-            emit(ConversationSendMessageState());
-          }).catchError((error) {
+            await FirebaseFirestore.instance
+                .collection("ChatList")
+                .doc(userID)
+                .collection('Chats')
+                .doc(receiverID)
+                .get()
+                .then((value) async {
+              if (value.exists) {
+                Map data = value.data()!;
+                print("Chat Exist with ID ${data["ChatID"]}\n");
+                chatID = data["ChatID"];
+                chatListMap['ChatID'] = chatID;
+                await FirebaseFirestore.instance
+                    .collection("ChatList")
+                    .doc(userID)
+                    .collection('Chats')
+                    .doc(receiverID)
+                    .update(chatListMap);
+                await FirebaseFirestore.instance
+                    .collection("ChatList")
+                    .doc(receiverID)
+                    .collection('Chats')
+                    .doc(userID)
+                    .update(chatListMap2);
+              }
+            });
+            emit(ConversationSendFilesSuccessState());
+          }).catchError((error){
+            print("UPLOAD ERROR : $error\n");
             uploadingRecordName = "";
-            emit(ConversationSendMessageErrorState(error.toString()));
+            emit(ConversationSendFilesErrorState(error.toString()));
           });
         }).catchError((error) {
+          print("UPLOAD ERROR : $error\n");
           uploadingRecordName = "";
-          emit(ConversationSendMessageErrorState(error.toString()));
+          emit(ConversationSendFilesErrorState(error.toString()));
         });
       }).catchError((error) {
+        print("UPLOAD ERROR : $error\n");
         uploadingRecordName = "";
-        emit(ConversationSendMessageErrorState(error.toString()));
+        emit(ConversationSendFilesErrorState(error.toString()));
       });
-    });
-  }
-
-/*
-  void getMessages(String receiverID) async {
-    emit(ConversationLoadingMessageState());
-
-    FirebaseDatabase.instance
-        .reference()
-        .child('Messages')
-        .onValue
-        .listen((event) {
-      chatList.clear();
-      chatListReversed.clear();
-      messageImages!.clear();
-      messageImagesStringList!.clear();
-      chatModel = null;
-      galleryItemModel = null;
-
-      if (event.snapshot.exists) {
-        Map data = event.snapshot.value;
-        if (data.isNotEmpty) {
-          data.forEach((key, val) {
-            //print('Message Data : $val');
-            if (val["hasImages"] == true) {
-              val["messageImages"].forEach((image){
-                print("Test Image $image\n");
-                if(!messageImages!.contains(image)){
-                  messageImages!.add(XFile(image));
-                }
-
-                print("Test Image List  ${messageImages!.length}\n");
-              });
-              messageImagesStringList = messageImages!.map<String>((file) => file!.path).toList();
-              print("Test String Length ${messageImagesStringList!.length}\n");
-              print("Test String Length ${messageImagesStringList![0].toString()}\n");
-
-            }
-
-            chatModel = ChatModel(
-              val["SenderID"],
-              val["ReceiverID"],
-              val["Message"],
-              val["messageTime"],
-              val["messageFullTime"],
-              val["createdAt"],
-              messageImages,
-              val["type"],
-              val["isSeen"],
-              val["fileName"],
-              val["hasImages"],
-              messageImagesStringList,
-            );
-
-            if (((chatModel!.senderID.toString() == userID) &&
-                (chatModel!.receiverID.toString() == receiverID)) ||
-                (chatModel!.receiverID.toString() == userID) &&
-                    (chatModel!.senderID.toString() == receiverID)) {
-              //buildItemsList(messageImagesStringList!);
-              chatList.add(chatModel!);
-              chatListReversed = chatList.reversed.toList();
-            }
-          });
-        }
-      }
-
-      emit(ConversationGetMessageSuccessState());
-    });
-    print("User ID : $userID\n");
-    await FirebaseDatabase.instance
-        .reference()
-        .child("ChatList")
-        .child(userID)
-        .child("Future Of Egypt")
-        .once()
-        .then((value) {
-      if (!value.exists) {
-        FirebaseDatabase.instance
-            .reference()
-            .child("ChatList")
-            .child(userID)
-            .child("Future Of Egypt")
-            .child("ReceiverID")
-            .set("Future Of Egypt");
-      }
     }).catchError((error) {
-      emit(ConversationGetMessageErrorState(error.toString()));
+      print("UPLOAD ERROR : $error\n");
+      uploadingRecordName = "";
+      emit(ConversationSendFilesErrorState(error.toString()));
     });
-
-    await FirebaseDatabase.instance
-        .reference()
-        .child("ChatList")
-        .child("Future Of Egypt")
-        .child(userID)
-        .child("ReceiverID")
-        .set(userID);
   }
-*/
 
-  Future<void> downloadDocumentFile(String receiverID, String fileName) async {
+  Future<void> downloadDocumentFile(String receiverID,String chatID, String fileName) async {
     emit(ConversationLoadingDownloadFileState(fileName));
     downloadingFileName = fileName;
 
@@ -765,13 +745,13 @@ class ConversationCubit extends Cubit<ConversationStates> {
           ExternalPath.DIRECTORY_DOWNLOADS);
 
       File downloadToFile =
-          File('$path/Future Of Egypt Media/Documents/$fileName');
+          File('$path/IT Department/Documents/$fileName');
 
-      //try {
+      try {
       await FirebaseStorage.instance
-          .ref('Messages')
-          .child(receiverID)
-          .child("Future Of Egypt")
+          .ref('Chats')
+          .child(chatID)
+          .child("Documents")
           .child(fileName)
           .writeToFile(downloadToFile)
           .then((p0) {
@@ -781,10 +761,10 @@ class ConversationCubit extends Cubit<ConversationStates> {
         downloadingFileName = "";
         emit(ConversationDownloadFileErrorState(error.toString()));
       });
-      // } on FirebaseException catch (e) {
-      // downloadingFileName = "";
-      // emit(ConversationDownloadFileErrorState(e.message.toString()));
-      // }
+       } on FirebaseException catch (e) {
+       downloadingFileName = "";
+       emit(ConversationDownloadFileErrorState(e.message.toString()));
+      }
     } else {
       showToast(
           message: "يجب الموافقة على الاذن اولاً",
@@ -803,11 +783,11 @@ class ConversationCubit extends Cubit<ConversationStates> {
     var status = await Permission.storage.request();
     if (status == PermissionStatus.granted) {
       File downloadToFile = File(
-          '/storage/emulated/0/Download/Future Of Egypt Media/Records/$fileName');
-
+          '/storage/emulated/0/Download/IT Department/Records/$fileName');
+      print("FILE NAME : $fileName\n");
       try {
         await FirebaseStorage.instance
-            .ref('Messages/$userID/Future Of Egypt/$fileName')
+            .ref('Chats/$chatID/Records/$fileName')
             .writeToFile(downloadToFile);
         downloadingRecordName = "";
         emit(ConversationDownloadFileSuccessState());
@@ -815,6 +795,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
         chatMicrophoneOnTapAction(index, fileName);
       } on FirebaseException catch (e) {
         downloadingRecordName = "";
+        print(e.message.toString());
         emit(ConversationDownloadFileErrorState(e.message.toString()));
       }
     } else {
@@ -862,14 +843,14 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
   bool checkForDocumentFile(String fileName) {
     bool isFileExist = File(
-            "/storage/emulated/0/Download/Future Of Egypt Media/Documents/$fileName")
+            "/storage/emulated/0/Download/IT Department/Documents/$fileName")
         .existsSync();
     return isFileExist;
   }
 
   bool checkForAudioFile(String fileName) {
     bool isFileExist = File(
-            "/storage/emulated/0/Download/Future Of Egypt Media/Records/$fileName")
+            "/storage/emulated/0/Download/IT Department/Records/$fileName")
         .existsSync();
     return isFileExist;
   }
@@ -893,7 +874,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
       var externalDoc = await ExternalPath.getExternalStoragePublicDirectory(
           ExternalPath.DIRECTORY_DOWNLOADS);
       final Directory recordingsDirectory =
-          Directory('$externalDoc/Future Of Egypt Media/Documents/');
+          Directory('$externalDoc/IT Department/Documents/');
 
       if (await recordingsDirectory.exists()) {
         //if folder already exists return path
@@ -917,7 +898,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
       var externalDoc = await ExternalPath.getExternalStoragePublicDirectory(
           ExternalPath.DIRECTORY_DOWNLOADS);
       final Directory recordingsDirectory =
-          Directory('$externalDoc/Future Of Egypt Media/Records/');
+          Directory('$externalDoc/IT Department/Records/');
 
       if (await recordingsDirectory.exists()) {
         //if folder already exists return path
@@ -958,16 +939,19 @@ class ConversationCubit extends Cubit<ConversationStates> {
     }
   }
 
-  Future recordAudio() async {
+  void startRecord()async {
+    lockedRecord = false;
+    movable = true;
+    recordButtonSize = 80;
+    recordButtonMicColor = Colors.white;
+    recording = true;
     var status = await Permission.microphone.request();
     if (status == PermissionStatus.granted) {
       audioRecorder = Record();
-      String currentFullTime =
-          DateFormat("yyyy-MM-dd-HH-mm-ss").format(DateTime.now());
+      String currentFullTime = DateFormat("yyyy-MM-dd-HH-mm-ss").format(DateTime.now());
       String extension = ".m4a";
       await createUserRecordingsDirectory();
-      audioPath =
-          "/storage/emulated/0/Download/Future Of Egypt Media/Records/${currentFullTime.trim().toString()}-audio$extension";
+      audioPath = "/storage/emulated/0/Download/IT Department/Records/${currentFullTime.trim().toString()}-audio$extension";
       audioPathStore = "${currentFullTime.trim().toString()}-audio$extension";
       await audioRecorder.start(
           path: audioPath,
@@ -990,13 +974,43 @@ class ConversationCubit extends Cubit<ConversationStates> {
     }
   }
 
-  Future stopRecord(String receiverID) async {
+  Future recordAudio() async {
+    var status = await Permission.microphone.request();
+    if (status == PermissionStatus.granted) {
+      audioRecorder = Record();
+      String currentFullTime = DateFormat("yyyy-MM-dd-HH-mm-ss").format(DateTime.now());
+      String extension = ".m4a";
+      await createUserRecordingsDirectory();
+      audioPath = "/storage/emulated/0/Download/IT Department/Records/${currentFullTime.trim().toString()}-audio$extension";
+      audioPathStore = "${currentFullTime.trim().toString()}-audio$extension";
+      await audioRecorder.start(
+          path: audioPath,
+          bitRate: 16000,
+          samplingRate: 16000,
+          encoder: AudioEncoder.AAC);
+      bool recording = await audioRecorder.isRecording();
+      isRecording = recording;
+      recordDuration = 0;
+      startedRecordValue.value = true;
+      startTimer();
+      emit(ConversationStartRecordSuccessState());
+    } else {
+      showToast(
+          message: "يجب الموافقة على الاذن اولاً",
+          length: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3);
+      emit(ConversationPermissionDeniedState());
+    }
+  }
+
+  Future stopRecord(String receiverID, String chatID) async {
     timer?.cancel();
     ampTimer?.cancel();
     isRecording = false;
     startedRecordValue.value = false;
     await audioRecorder.stop();
-    await sendAudioMessage(receiverID, "Audio", false, File(audioPath));
+    await sendAudioMessage(receiverID, chatID, "Audio", false, File(audioPath));
     audioPath = "";
     audioPathStore = "";
     emit(ConversationStopRecordSuccessState());
@@ -1014,11 +1028,11 @@ class ConversationCubit extends Cubit<ConversationStates> {
     emit(ConversationCancelRecordSuccessState());
   }
 
-  Future toggleRecording(String receiverID) async {
+  Future toggleRecording(String receiverID, String chatID) async {
     if (!isRecording) {
       await recordAudio();
     } else {
-      await stopRecord(receiverID);
+      await stopRecord(receiverID, chatID);
     }
     emit(ConversationToggleRecordSuccessState());
   }
@@ -1038,11 +1052,11 @@ class ConversationCubit extends Cubit<ConversationStates> {
       emit(ConversationIncreaseTimerSuccessState());
     });
 
-    ampTimer =
+    /*ampTimer =
         Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
       amplitude = await audioRecorder.getAmplitude();
       emit(ConversationAmpTimerSuccessState());
-    });
+    });*/
   }
 
   void initRecorder() async {

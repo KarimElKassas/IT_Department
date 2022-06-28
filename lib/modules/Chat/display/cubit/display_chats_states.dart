@@ -10,9 +10,13 @@ class DisplayChatsCreateChatSuccessState extends DisplayChatsStates{}
 
 class DisplayChatsLoadingChatsState extends DisplayChatsStates{}
 
+class DisplayChatsLoadingUserDataState extends DisplayChatsStates{}
+
 class DisplayChatsGetMessagesSuccessState extends DisplayChatsStates{}
 
 class DisplayChatsGetChatsState extends DisplayChatsStates{}
+
+class DisplayChatsGetUserDataState extends DisplayChatsStates{}
 
 class DisplayChatsGetChatsErrorState extends DisplayChatsStates{
 

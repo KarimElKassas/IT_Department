@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:it_department/modules/Chat/display/screens/display_chats_screen.dart';
 import 'package:it_department/modules/Home/cubit/home_cubit.dart';
 import 'package:it_department/modules/Home/cubit/home_states.dart';
 import 'package:it_department/modules/Home/screens/device_details_screen.dart';
@@ -36,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           Expanded(
-                            flex: 10,
+                            flex: 14,
                             child: Container(
                               //alignment: Alignment.topCenter,
                               constraints: const BoxConstraints.expand(),
@@ -329,42 +330,211 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                color: white,
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.04,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 24),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      color: darkGreen,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.04,
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: SvgPicture.asset(
-                                          'assets/images/logo_side_white.svg',
+                          Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  onTap: (){
+                                    cubit.navigate(context, DisplayChatsScreen());
+                                  },
+                                  child: Container(
+                                    width: MediaQuery.of(
+                                        context)
+                                        .size
+                                        .width *
+                                        0.4,
+                                    decoration:
+                                    BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius
+                                          .circular(
+                                          8),
+                                      color: white,
+                                    ),
+                                    height: MediaQuery.of(
+                                        context)
+                                        .size
+                                        .height *
+                                        0.05,
+                                    child: Center(
+                                      child: AutoSizeText(
+                                        "المحادثات",
+                                        style: TextStyle(
+                                            color:
+                                            darkGreen,
+                                            fontFamily:
+                                            "Questv",
+                                            fontSize:
+                                            18),
+                                        maxLines: 1,
+                                        minFontSize:
+                                        12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8,),
+                                cubit.landPlotOptionItemSelected.id != 0 ?
+                                FadeInUp(
+                                  duration: const Duration(milliseconds: 1000),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                                    child:
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'اسم المشروع : ',
+                                            style: TextStyle(color: white, fontSize: 16, fontFamily: "Questv"),
+                                          ),
+                                          TextSpan(
+                                            text: cubit.landPlotOptionItemSelected.title,
+                                            style: TextStyle(color: orangeColor, fontFamily: "Questv", fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),),
+                                ) : getEmptyWidget(),
+                                cubit.landPlotOptionItemSelected.id != 0 ?
+                                FadeInUp(
+                                  duration: const Duration(milliseconds: 1000),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'عدد الأعمدة : ',
+                                            style: TextStyle(color: white, fontSize: 16, fontFamily: "Questv"),
+                                          ),
+                                          TextSpan(
+                                            text: '${cubit.landPlotColumnsList.isEmpty ? "-" : cubit.landPlotColumnsList.length}',
+                                            style: TextStyle(color: orangeColor, fontFamily: "Questv", fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),),
+                                ) : getEmptyWidget(),
+                                FadeInUp(
+                                    duration: const Duration(milliseconds: 1000),
+                                    child: Divider(height: 1, color: white,)),
+                                cubit.landPlotColumnsOptionItemSelected.id != 0 ?
+                                FadeInUp(
+                                  duration: const Duration(milliseconds: 1000),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                                    child:
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'اسم العمود : ',
+                                            style: TextStyle(color: white, fontSize: 16, fontFamily: "Questv"),
+                                          ),
+                                          TextSpan(
+                                            text: cubit.landPlotColumnsOptionItemSelected.title,
+                                            style: TextStyle(color: orangeColor, fontFamily: "Questv", fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),),
+                                ) : getEmptyWidget(),
+                                cubit.landPlotColumnsOptionItemSelected.id != 0 ?
+                                FadeInUp(
+                                  duration: const Duration(milliseconds: 1000),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'عدد القطع بالعمود ',
+                                            style: TextStyle(color: white, fontSize: 16, fontFamily: "Questv"),
+                                          ),
+                                          TextSpan(
+                                            text: cubit.landPlotColumnsOptionItemSelected.title,
+                                            style: TextStyle(color: orangeColor, fontFamily: "Questv", fontSize: 16),
+                                          ),
+                                          TextSpan(
+                                            text: ' : ',
+                                            style: TextStyle(color: white, fontSize: 16, fontFamily: "Questv"),
+                                          ),
+                                          TextSpan(
+                                            text: '${cubit.landPlotPiecesList.isEmpty ?"-" : cubit.landPlotPiecesList.length}',
+                                            style: TextStyle(color: orangeColor, fontFamily: "Questv", fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ) : getEmptyWidget(),
+                                cubit.landPlotPiecesOptionItemSelected.id != 0 ?
+                                FadeInUp(
+                                  duration: const Duration(milliseconds: 1000),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'عدد الأجهزة بالقطعة ',
+                                            style: TextStyle(color: white, fontSize: 16, fontFamily: "Questv"),
+                                          ),
+                                          TextSpan(
+                                              text: cubit.landPlotPiecesOptionItemSelected.title,
+                                              style: TextStyle(color: orangeColor, fontFamily: "Questv", fontSize: 16),
+                                          ),
+                                          TextSpan(
+                                            text: ' : ',
+                                            style: TextStyle(color: white, fontSize: 16, fontFamily: "Questv"),
+                                          ),
+                                          TextSpan(
+                                            text: '${cubit.landPlotDevicesList.isEmpty ?"-" : cubit.landPlotDevicesList.length}',
+                                            style: TextStyle(color: orangeColor, fontFamily: "Questv", fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ) : getEmptyWidget(),
+                                FadeInUp(duration: const Duration(milliseconds: 1000), child: Divider(height: 1, color: white,)),
+                                const SizedBox(height: 4,),
+                                Container(
+                                  color: white,
+                                  width: MediaQuery.of(context).size.width,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.04,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 24),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        color: darkGreen,
+                                        width: MediaQuery.of(context).size.width *
+                                            0.3,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.04,
+                                        child: Align(
                                           alignment: Alignment.center,
-                                          //width: MediaQuery.of(context).size.width,
+                                          child: SvgPicture.asset(
+                                            'assets/images/logo_side_white.svg',
+                                            alignment: Alignment.center,
+                                            //width: MediaQuery.of(context).size.width,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ))
+                          ),
+                          )
                         ],
                       ),
                     );

@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class ResponsiveApp {
   static MediaQueryData? _mediaQueryData;
 

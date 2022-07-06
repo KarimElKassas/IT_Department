@@ -8,6 +8,10 @@ Color teal700 =  Colors.teal[700]!;
 Color teal =  Colors.teal;
 Color white =  Colors.white;
 Color orangeColor =  const Color(0xffBF9A35);
+Color greyBorderColor = const Color(0xffD4DDE8);
+Color greyThreeColor = const Color(0xff92A8C4);
+Color greyFiveColor = const Color(0xFFEBEEF5);
+Color greySixColor = const Color(0xFFF8F9FC);
 
 List<dynamic>? messageImagesStaticList = [];
 bool customerLogged = false;

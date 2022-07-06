@@ -107,6 +107,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
   void initPageManager(){
   pageManager = PageManager();
   }
+
   void getChatData(String userID, String userName, String userImage, String userToken, String chat){
     receiverID = userID;
     receiverName = userName;
@@ -114,6 +115,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     receiverToken = userToken;
     chatID = chat;
   }
+
   changeOpacity() {
     if(lockedRecord){
       Future.delayed(const Duration(milliseconds: 1500), () {
@@ -272,6 +274,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessageType'] = type;
     chatListMap['LastMessageTime'] = currentTime;
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
+    chatListMap["TimeStamp"] = Timestamp.now();
 
     Map<String, dynamic> chatListMap2 = HashMap();
     chatListMap2['ReceiverID'] = userID;
@@ -282,6 +285,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap2['LastMessageType'] = type;
     chatListMap2['LastMessageTime'] = currentTime;
     chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
+    chatListMap2["TimeStamp"] = Timestamp.now();
 
     print("Clerk Image : ${prefs.getString("ClerkImage")}\n");
 
@@ -346,6 +350,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessageType'] = "file";
     chatListMap['LastMessageTime'] = currentTime;
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
+    chatListMap["TimeStamp"] = Timestamp.now();
 
     Map<String, dynamic> chatListMap2 = HashMap();
     chatListMap2['ReceiverID'] = userID;
@@ -356,6 +361,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap2['LastMessageType'] = "file";
     chatListMap2['LastMessageTime'] = currentTime;
     chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
+    chatListMap2["TimeStamp"] = Timestamp.now();
 
       ref.doc(currentFullTime).set(dataMap).then((value) async {
         uploadingFileName = currentFullTime;
@@ -459,6 +465,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
               chatListMap['LastMessageType'] = messageType;
               chatListMap['LastMessageTime'] = currentTime;
               chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
+              chatListMap["TimeStamp"] = Timestamp.now();
 
               Map<String, dynamic> chatListMap2 = HashMap();
               chatListMap2['ReceiverID'] = userID;
@@ -469,6 +476,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
               chatListMap2['LastMessageType'] = messageType;
               chatListMap2['LastMessageTime'] = currentTime;
               chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
+              chatListMap2["TimeStamp"] = Timestamp.now();
 
               print("Clerk Image : ${prefs.getString("ClerkImage")}\n");
               chatListRef.update(chatListMap);
@@ -497,6 +505,19 @@ class ConversationCubit extends Cubit<ConversationStates> {
         emit(ConversationSendImagesErrorState(error.toString()));
       });
     }
+  }
+
+  void getChatInfo(String chatID) async {
+
+    FirebaseFirestore.instance
+        .collection("Chats")
+        .doc(chatID)
+        .snapshots()
+        .listen((event) {
+
+          print("Chat INFO : ${event.data()}\n");
+    });
+
   }
 
   void getFireStoreMessage(String receiverID, String chatID) async {
@@ -663,6 +684,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessageType'] = "audio";
     chatListMap['LastMessageTime'] = currentTime;
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
+    chatListMap["TimeStamp"] = Timestamp.now();
 
     Map<String, dynamic> chatListMap2 = HashMap();
     chatListMap2['ReceiverID'] = userID;
@@ -673,6 +695,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap2['LastMessageType'] = "audio";
     chatListMap2['LastMessageTime'] = currentTime;
     chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
+    chatListMap2["TimeStamp"] = Timestamp.now();
 
     ref.doc(currentFullTime).set(dataMap).then((value) async {
       uploadingRecordName = currentFullTime;

@@ -32,12 +32,6 @@ class ConversationScreen extends StatefulWidget {
   final String userName;
   final String userImage;
   final String userToken;
-  final String userPhone;
-  final String userCategory;
-  final String userRank;
-  final String userDepartment;
-  final String userJob;
-
 
    const ConversationScreen(
       {Key? key,
@@ -46,11 +40,6 @@ class ConversationScreen extends StatefulWidget {
       required this.userName,
       required this.userImage,
       required this.userToken,
-      required this.userPhone,
-      required this.userCategory,
-      required this.userRank,
-      required this.userDepartment,
-      required this.userJob,
       })
       : super(key: key);
 
@@ -86,6 +75,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ..createUserRecordingsDirectory()
         ..initRecorder()
         ..initPageManager()
+        ..getChatInfo(widget.chatID)
         ..getFireStoreMessage(widget.userID, widget.chatID),
       child: BlocConsumer<ConversationCubit, ConversationStates>(
         listener: (context, state) {
@@ -175,14 +165,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           child: InkWell(
                             onTap: () {
                               cubit.navigate(context, ChatProfileScreen(
+                                  chatID: widget.chatID,
                                   userName: widget.userName,
                                   userImage: widget.userImage,
-                                  userPhone: widget.userPhone,
                                   userNumber: widget.userID,
-                                  userRank: widget.userRank,
-                                  userCategory: widget.userCategory,
-                                  userDepartment: widget.userDepartment,
-                                  userJob: widget.userJob,
                                   chatList: cubit.chatListReversed,
                               ));
                             },
@@ -369,7 +355,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
-  Widget   chat(BuildContext context, ConversationCubit cubit, int index,
+  Widget chat(BuildContext context, ConversationCubit cubit, int index,
       ConversationStates state){
 
     if(cubit.chatListReversed[index].type == "Text"){

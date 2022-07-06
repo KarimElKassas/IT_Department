@@ -364,7 +364,7 @@ class ClerkRegisterCubit extends Cubit<ClerkRegisterStates> {
 
           clerksCollection.doc(clerkNumber).update(dataMap).then((
               realtimeDbValue) async {
-            clerkFirebaseModel = ClerkFirebaseModel(clerkID, clerkName, value.toString(), managementID, jobName, clerkNumber, clerkAddress, clerkPhone, clerkPassword, "متصل الأن", clerkToken,["empty"]);
+            clerkFirebaseModel = ClerkFirebaseModel(clerkID, clerkName, value.toString(), managementID, jobName, categoryName, clerkNumber, clerkAddress, clerkPhone, clerkPassword, "متصل الأن", clerkToken,["empty"]);
 
             SharedPreferences prefs = await SharedPreferences.getInstance();
 

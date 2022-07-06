@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:it_department/modules/Chat/display/screens/display_chats_screen.dart';
+import 'package:it_department/modules/GroupChat/create/screens/select_group_users_screen.dart';
 import 'package:it_department/modules/Home/cubit/home_cubit.dart';
 import 'package:it_department/modules/Home/cubit/home_states.dart';
 import 'package:it_department/modules/Home/screens/device_details_screen.dart';
@@ -340,6 +341,47 @@ class HomeScreen extends StatelessWidget {
                                 InkWell(
                                   onTap: (){
                                     cubit.navigate(context, DisplayChatsScreen());
+                                  },
+                                  child: Container(
+                                    width: MediaQuery.of(
+                                        context)
+                                        .size
+                                        .width *
+                                        0.4,
+                                    decoration:
+                                    BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius
+                                          .circular(
+                                          8),
+                                      color: white,
+                                    ),
+                                    height: MediaQuery.of(
+                                        context)
+                                        .size
+                                        .height *
+                                        0.05,
+                                    child: Center(
+                                      child: AutoSizeText(
+                                        "المحادثات",
+                                        style: TextStyle(
+                                            color:
+                                            darkGreen,
+                                            fontFamily:
+                                            "Questv",
+                                            fontSize:
+                                            18),
+                                        maxLines: 1,
+                                        minFontSize:
+                                        12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8,),
+                                InkWell(
+                                  onTap: (){
+                                    cubit.navigate(context, SelectGroupUsersScreen());
                                   },
                                   child: Container(
                                     width: MediaQuery.of(

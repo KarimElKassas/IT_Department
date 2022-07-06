@@ -15,23 +15,19 @@ import 'dart:math' as math; // import this
 class ChatProfileScreen extends StatelessWidget {
   const ChatProfileScreen({
     Key? key,
+    required this.chatID,
     required this.userName,
     required this.userImage,
-    required this.userPhone,
     required this.userNumber,
-    required this.userRank,
-    required this.userCategory,
-    required this.userDepartment,
-    required this.userJob,
     required this.chatList,
   }) : super(key: key);
 
-  final String userName, userImage, userPhone, userNumber, userRank, userCategory, userDepartment, userJob;
+  final String chatID, userName, userImage, userNumber;
   final List<ChatModel> chatList;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ChatProfileCubit()..filterMedia(chatList),
+      create: (context) => ChatProfileCubit()..getUserData(context, userNumber, chatID)..filterMedia(chatList),
       child: BlocConsumer<ChatProfileCubit, ChatProfileStates>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -97,9 +93,9 @@ class ChatProfileScreen extends StatelessWidget {
                                   const SizedBox(height: 50,),
                                   Text(userName, style: TextStyle(color: lightGreen, fontFamily: "Questv", fontSize: 16, fontWeight: FontWeight.bold),),
                                   const SizedBox(height: 6,),
-                                  Text(userPhone, style: TextStyle(color: lightGreen, fontFamily: "Questv", fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 3),),
+                                  Text(cubit.userPhone, style: TextStyle(color: lightGreen, fontFamily: "Questv", fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 3),),
                                   const SizedBox(height: 6,),
-                                  Text("$userRank  •  $userDepartment  •  $userJob", style: TextStyle(color: lightGreen, fontFamily: "Questv", fontSize: 14, fontWeight: FontWeight.bold),),
+                                  Text("${cubit.userRank}  •  ${cubit.userDepartment}  •  ${cubit.userJob}", style: TextStyle(color: lightGreen, fontFamily: "Questv", fontSize: 14, fontWeight: FontWeight.bold),),
                                   const SizedBox(height: 6,),
                                 ],
                               ),

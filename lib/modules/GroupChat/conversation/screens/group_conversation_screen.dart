@@ -36,6 +36,7 @@ class GroupConversationScreen extends StatefulWidget {
   final String groupImage;
   final List<Object?> adminsList;
   final List<Object?> membersList;
+  final String openedFrom;
 
   const GroupConversationScreen(
       {Key? key,
@@ -43,7 +44,9 @@ class GroupConversationScreen extends StatefulWidget {
       required this.groupName,
       required this.groupImage,
       required this.adminsList,
-      required this.membersList})
+      required this.membersList,
+      required this.openedFrom
+      })
       : super(key: key);
 
   @override
@@ -102,8 +105,11 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
 
           return WillPopScope(
             onWillPop: (){
-              finish(context, DisplayChatsScreen(initialIndex: 1,));
-              // ignore: null_argument_to_non_null_type
+              if(widget.openedFrom == "Display"){
+                Navigator.pop(context);
+              }else{
+                finish(context, DisplayChatsScreen(initialIndex: 1));
+              }
               return Future.value();
             },
             child: Scaffold(
@@ -126,7 +132,11 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                         children: <Widget>[
                           IconButton(
                             onPressed: () {
-                              finish(context, DisplayChatsScreen(initialIndex: 1,));
+                              if(widget.openedFrom == "Display"){
+                                Navigator.pop(context);
+                              }else{
+                                finish(context, DisplayChatsScreen(initialIndex: 1));
+                              }
                             },
                             icon: Transform.scale(
                               scale: 1,
@@ -446,7 +456,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                   : white),
             ),
             padding:
-            const EdgeInsets.only(top: 10, bottom: 10, right: 10, left: 16),
+            const EdgeInsets.only(top: 6, bottom: 4, right: 12, left: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -574,7 +584,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                         : CrossAxisAlignment.start,
                     children: [
                       cubit.chatListReversed[index].senderID != cubit.userID ? Padding(
-                        padding: const EdgeInsets.only(bottom: 4.0, top: 2, left: 4, right: 4),
+                        padding: const EdgeInsets.only(bottom: 2.0, top: 4, left: 4, right: 6),
                         child: Text(
                           cubit.chatListReversed[index].senderName,
                           style: const TextStyle(
@@ -685,7 +695,6 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
             },
             child: Container(
               width: 60.w,
-              //height: 30.h,
               decoration: BoxDecoration(
                   borderRadius:
                   cubit.chatListReversed[index].senderID == cubit.userID
@@ -741,10 +750,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                           cubit.chatListReversed[index].imagesCount == 1 ?
                           ClipRRect(
                             child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(14.0),
-                                  topRight: Radius.circular(14.0),
-                                 ),
+                              borderRadius: BorderRadius.circular(14.0),
                               child: CachedNetworkImage(
                                 width: double.infinity,
                                 height: 29.h,
@@ -753,7 +759,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                     .toString(),
                                 imageBuilder: (context, imageProvider) =>
                                     ClipRRect(
-                                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(0.0),
+                                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(14.0),
                                         topRight: Radius.circular(14.0),),
                                       child: FadeInImage(
                                         fit: BoxFit.cover,
@@ -880,10 +886,9 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
               ? Alignment.centerRight
               : Alignment.centerLeft,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Container(
-                width: MediaQuery.of(context).size.width * 0.65,
-                // 45% of total width
+                width: 60.w,
                 //height: 300,
                 alignment: Alignment.topLeft,
                 decoration: BoxDecoration(
@@ -908,14 +913,15 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                     .messageImagesList.length ==
                     cubit.chatListReversed[index].imagesCount
                     ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         cubit.chatListReversed[index].senderID != cubit.userID ? Padding(
-                          padding: const EdgeInsets.only(bottom: 4.0, top: 2, left: 4, right: 4),
+                          padding: const EdgeInsets.only(bottom: 2.0, top: 4, left: 4, right: 8),
                           child: Text(
                             cubit.chatListReversed[index].senderName,
                             style: const TextStyle(
                               fontFamily: "Questv",
-                              fontSize: 10,
+                              fontSize: 8,
                               fontWeight: FontWeight.bold,
                               color: Colors.red,
                             ),
@@ -929,13 +935,13 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                 cubit.chatListReversed[index].imagesCount > 4
                                     ? 4
                                     : cubit.chatListReversed[index].imagesCount,
-                                padding: const EdgeInsets.all(6),
                                 semanticChildCount: 1,
+                                padding: const EdgeInsets.all(6),
                                 gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
-                                  mainAxisSpacing: 5,
-                                  crossAxisSpacing: 3,
+                                  mainAxisSpacing: 2,
+                                  crossAxisSpacing: 2,
                                 ),
                                 shrinkWrap: true,
                                 itemBuilder:
@@ -957,7 +963,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                 }),
                             Positioned(
                               bottom: 5,
-                              right: 5,
+                              right: 8,
                               child: Text(
                                 cubit.chatListReversed[index].messageTime,
                                 style: TextStyle(
@@ -1003,7 +1009,10 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
               .messageImagesList[imageIndex]!,
         ),
         Container(
-          color: Colors.black.withOpacity(.5),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(.5),
+            borderRadius: BorderRadius.circular(8)
+          ),
           child: Center(
             child: Text(
               "+ ${cubit.chatListReversed[index].imagesCount - imageIndex}",

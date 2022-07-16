@@ -452,6 +452,7 @@ class _GroupChatUIState extends State<GroupChatUI> {
                 if (cubit.lockedRecord) lockedRecordWidget(cubit)
               ],
             ),
+            clipBehavior: Clip.none,
           );
         },
       ),

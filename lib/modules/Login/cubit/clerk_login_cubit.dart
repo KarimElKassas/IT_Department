@@ -97,10 +97,17 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
               emit(ClerkLoginNoUserState());
             } else {
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              var userID = value.data[0]["PR_Persons_Number"].toString();
               var userName = value.data[0]["PR_Persons_Name"].toString();
               var userPassword = value.data[0]["User_Password"].toString();
-              var userNumber = value.data[0]["PR_Persons_Number"].toString();
+              var userID = "";
+              var userNumber = "";
+              if(value.data[0]["PR_Persons_Number"].toString().isNotEmpty){
+                userID = value.data[0]["PR_Persons_Number"].toString();
+                userNumber = value.data[0]["PR_Persons_Number"].toString();
+              }else{
+                userID = value.data[0]["PR_National_Number"].toString();
+                userNumber = value.data[0]["PR_National_Number"].toString();
+              }
               var userPhone = value.data[0]["PR_Persons_MobilNum1"].toString();
               var userManagementID = value.data[0]["PR_Management_ID"].toString();
               var userManagementName = value.data[0]["PR_Management_Name"].toString();
@@ -158,7 +165,7 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
                   emit(ClerkLoginSuccessState());
               });
             }
-          }).catchError((error) {
+          }).catchError((DioError error) {
             if (error.type == DioErrorType.response) {
               showToast(
                   message: "لا يوجد مستخدم بهذه البيانات",

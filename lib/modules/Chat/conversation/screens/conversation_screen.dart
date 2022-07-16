@@ -33,6 +33,7 @@ class ConversationScreen extends StatefulWidget {
   final String userName;
   final String userImage;
   final String userToken;
+  final String openedFrom;
 
    const ConversationScreen(
       {Key? key,
@@ -41,6 +42,7 @@ class ConversationScreen extends StatefulWidget {
       required this.userName,
       required this.userImage,
       required this.userToken,
+      required this.openedFrom,
       })
       : super(key: key);
 
@@ -95,8 +97,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
           var cubit = ConversationCubit.get(context);
           return WillPopScope(
             onWillPop: (){
-              finish(context, DisplayChatsScreen(initialIndex: 0));
-
+              if(widget.openedFrom == "Display"){
+                Navigator.pop(context);
+              }else{
+                finish(context, DisplayChatsScreen(initialIndex: 0));
+              }
               return Future.value();
             },
             child: Scaffold(
@@ -119,7 +124,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         children: <Widget>[
                           IconButton(
                             onPressed: () {
-                              finish(context, DisplayChatsScreen(initialIndex: 0));
+                              if(widget.openedFrom == "Display"){
+                                  Navigator.pop(context);
+                              }else{
+                                finish(context, DisplayChatsScreen(initialIndex: 0));
+                              }
                             },
                             icon: Transform.scale(
                               scale: 1,

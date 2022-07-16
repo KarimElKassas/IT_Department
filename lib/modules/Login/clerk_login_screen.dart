@@ -263,11 +263,11 @@ class ClerkLoginScreen extends StatelessWidget {
                                 defaultButton(
                                     function: () {
                                       if (formKey.currentState!.validate()) {
-                                        cubit.signManual(context);
-                                        /*cubit.signInUser(
+                                       // cubit.signManual(context);
+                                        cubit.signInUser(
                                             context,
                                             nameController.text.toString(),
-                                            passwordController.text.toString());*/
+                                            passwordController.text.toString());
                                       }
                                     },
                                     width: MediaQuery.of(context).size.width * 0.40,

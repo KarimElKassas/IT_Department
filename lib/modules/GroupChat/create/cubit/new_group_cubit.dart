@@ -137,6 +137,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
           groupImage: groupImage,
           adminsList: adminsList,
           membersList: selectedClerksIDList,
+          openedFrom: "Create",
         ));
   }
 
@@ -160,7 +161,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
     emit(NewGroupLoadingUsersState());
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    print("${prefs.getString("ClerkID").toString()}\n");
     FirebaseFirestore.instance.collection("Clerks").where("ClerkID", isNotEqualTo: prefs.getString("ClerkID").toString()).snapshots().listen((event) {
       clerkList.clear();
       clerkSubscriptionsList = [];

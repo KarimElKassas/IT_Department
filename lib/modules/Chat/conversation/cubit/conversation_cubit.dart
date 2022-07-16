@@ -283,9 +283,8 @@ class ConversationCubit extends Cubit<ConversationStates> {
         .doc(currentFullTime)
         .set(dataMap)
         .then((value) async {
-
-      sendNotification(message, currentTime, userToken);
       chatListRef.update(chatListMap);
+      sendNotification(message, currentTime, userToken);
       emit(ConversationSendMessageState());
     });
   }

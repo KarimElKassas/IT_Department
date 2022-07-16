@@ -245,6 +245,7 @@ class DisplayChatsScreen extends StatelessWidget {
                   userName: cubit.filteredChatList[index].userName,
                   userImage: cubit.filteredChatList[index].userImage,
                   userToken: cubit.filteredChatList[index].userToken,
+                  openedFrom: "Display",
               ));
           /*cubit.getUserData(context, cubit.filteredChatList[index].userID,
               cubit.filteredChatList[index].chatID);*/
@@ -557,7 +558,9 @@ class DisplayChatsScreen extends StatelessWidget {
                   groupName: cubit.filteredGroupList[index].groupName,
                   groupImage: cubit.filteredGroupList[index].groupImage,
                   adminsList: cubit.filteredGroupList[index].adminsList,
-                  membersList: cubit.filteredGroupList[index].membersList));
+                  membersList: cubit.filteredGroupList[index].membersList,
+                  openedFrom: "Display",
+              ));
         },
         child: Row(
           children: [

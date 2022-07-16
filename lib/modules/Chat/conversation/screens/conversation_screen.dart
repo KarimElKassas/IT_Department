@@ -21,6 +21,7 @@ import '../../../../shared/components.dart';
 import '../../../../shared/constants.dart';
 import '../../../../shared/gallery_item_thumbnail.dart';
 import '../../../../shared/gallery_item_wrapper_view.dart';
+import '../../display/screens/display_chats_screen.dart';
 import 'chat_opened_image_screen.dart';
 import '../../widget/page_manager.dart';
 import '../cubit/conversation_cubit.dart';
@@ -92,122 +93,129 @@ class _ConversationScreenState extends State<ConversationScreen> {
         },
         builder: (context, state) {
           var cubit = ConversationCubit.get(context);
-          return Scaffold(
-            appBar: AppBar(
-              systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarColor: Colors.transparent,
-                statusBarIconBrightness: Brightness.dark,
-                // For Android (dark icons)
-                statusBarBrightness: Brightness.light, // For iOS (dark icons)
-              ),
-              elevation: 0,
-              backgroundColor: lightGreen.withOpacity(0.1),
-              automaticallyImplyLeading: false,
-              flexibleSpace: SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.only(left: 2.0, right: 2.0),
-                  child: Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: Row(
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Transform.scale(
-                            scale: 1,
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Colors.black,
-                              size: 24,
+          return WillPopScope(
+            onWillPop: (){
+              finish(context, DisplayChatsScreen(initialIndex: 0));
+
+              return Future.value();
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: Brightness.dark,
+                  // For Android (dark icons)
+                  statusBarBrightness: Brightness.light, // For iOS (dark icons)
+                ),
+                elevation: 0,
+                backgroundColor: veryLightGreen.withOpacity(0.1),
+                automaticallyImplyLeading: false,
+                flexibleSpace: SafeArea(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Row(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              finish(context, DisplayChatsScreen(initialIndex: 0));
+                            },
+                            icon: Transform.scale(
+                              scale: 1,
+                              child: const Icon(
+                                Icons.arrow_back_rounded,
+                                color: Colors.black,
+                                size: 24,
+                              ),
                             ),
                           ),
-                        ),
-                        CachedNetworkImage(
-                          imageUrl: widget.userImage,
-                          imageBuilder: (context, imageProvider) => ClipOval(
-                            child: FadeInImage(
+                          CachedNetworkImage(
+                            imageUrl: widget.userImage,
+                            imageBuilder: (context, imageProvider) => ClipOval(
+                              child: FadeInImage(
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.fill,
+                                image: imageProvider,
+                                placeholder: const AssetImage(
+                                    "assets/images/placeholder.jpg"),
+                                imageErrorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/error.png',
+                                    fit: BoxFit.fill,
+                                    height: 50,
+                                    width: 50,
+                                  );
+                                },
+                              ),
+                            ),
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(
+                              color: lightGreen,
+                              strokeWidth: 0.8,
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const FadeInImage(
                               height: 50,
                               width: 50,
                               fit: BoxFit.fill,
-                              image: imageProvider,
-                              placeholder: const AssetImage(
-                                  "assets/images/placeholder.jpg"),
-                              imageErrorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  'assets/images/error.png',
-                                  fit: BoxFit.fill,
-                                  height: 50,
-                                  width: 50,
-                                );
+                              image: AssetImage("assets/images/error.png"),
+                              placeholder:
+                                  AssetImage("assets/images/placeholder.jpg"),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 18,
+                          ),
+                          Flexible(
+                            child: InkWell(
+                              onTap: () {
+                                cubit.navigate(context, ChatProfileScreen(
+                                    chatID: widget.chatID,
+                                    userName: widget.userName,
+                                    userImage: widget.userImage,
+                                    userNumber: widget.userID,
+                                    chatList: cubit.chatListReversed,
+                                ));
                               },
+                              splashColor: Colors.transparent,
+                              child: Text(
+                                widget.userName,
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: "Questv",
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black),
+                              ),
                             ),
                           ),
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(
-                            color: lightGreen,
-                            strokeWidth: 0.8,
+                          const SizedBox(
+                            width: 16,
                           ),
-                          errorWidget: (context, url, error) =>
-                              const FadeInImage(
-                            height: 50,
-                            width: 50,
-                            fit: BoxFit.fill,
-                            image: AssetImage("assets/images/error.png"),
-                            placeholder:
-                                AssetImage("assets/images/placeholder.jpg"),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 18,
-                        ),
-                        Flexible(
-                          child: InkWell(
-                            onTap: () {
-                              cubit.navigate(context, ChatProfileScreen(
-                                  chatID: widget.chatID,
-                                  userName: widget.userName,
-                                  userImage: widget.userImage,
-                                  userNumber: widget.userID,
-                                  chatList: cubit.chatListReversed,
-                              ));
-                            },
-                            splashColor: Colors.transparent,
-                            child: Text(
-                              widget.userName,
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  fontFamily: "Questv",
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
+              body: Container(
+                color: veryLightGreen.withOpacity(0.1),
+                child: ChatUI(
+                  startRecord: () {},
+                  sendRecord: () {},
+                  deleteRecord: () {},
+                  allMessagesWidget: allMessagesWidget(cubit, state),
+                  textfield:
+                  textField(cubit, widget.userID, widget.userToken, widget.userName, widget.userImage, widget.chatID),
+                  receiverID: widget.userID,
+                  receiverName: widget.userName,
+                  receiverImage: widget.userImage,
+                  chatID: widget.chatID,
+                  receiverToken: widget.userToken,
+                  cubit: cubit,
+                  messageController: messageController,),),
             ),
-            body: Container(
-              color: lightGreen.withOpacity(0.1),
-              child: ChatUI(
-                startRecord: () {},
-                sendRecord: () {},
-                deleteRecord: () {},
-                allMessagesWidget: allMessagesWidget(cubit, state),
-                textfield:
-                textField(cubit, widget.userID, widget.userToken, widget.userName, widget.userImage, widget.chatID),
-                receiverID: widget.userID,
-                receiverName: widget.userName,
-                receiverImage: widget.userImage,
-                chatID: widget.chatID,
-                receiverToken: widget.userToken,
-                cubit: cubit,
-                messageController: messageController,),),
           );
         },
       ),

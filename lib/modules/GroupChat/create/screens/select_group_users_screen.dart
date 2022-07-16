@@ -196,52 +196,35 @@ class _SelectGroupUsersScreenState extends State<SelectGroupUsersScreen> {
                           width: MediaQuery.of(context).size.height * 0.07,
                           child: CachedNetworkImage(
                             imageUrl: cubit.selectedClerksList[index].clerkImage!,
-                            imageBuilder: (context,
-                                imageProvider) =>
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(96),
-                                  child: FadeInImage(
-                                    height: MediaQuery.of(context).size.height * 0.07,
-                                    width: MediaQuery.of(context).size.height * 0.07,
-                                    //height: double.infinity,
-                                    //width: double.infinity,
+                            imageBuilder: (context, imageProvider) => ClipOval(
+                              child: FadeInImage(
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.fill,
+                                image: imageProvider,
+                                placeholder: const AssetImage(
+                                    "assets/images/placeholder.jpg"),
+                                imageErrorBuilder:
+                                    (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/error.png',
                                     fit: BoxFit.fill,
-                                    image: imageProvider,
-                                    placeholder: const AssetImage(
-                                        "assets/images/placeholder.jpg"),
-                                    imageErrorBuilder:
-                                        (context, error,
-                                        stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/error.png',
-                                        fit: BoxFit.fill,
-                                        height: MediaQuery.of(context).size.height * 0.07,
-                                        width: MediaQuery.of(context).size.height * 0.07,
-                                      );
-                                    },
-                                  ),
-                                ),
-                            placeholder: (context, url) =>
-                                FadeInImage(
-                                  height: MediaQuery.of(context).size.height * 0.07,
-                                  width: MediaQuery.of(context).size.height * 0.07,
-                                  fit: BoxFit.fill,
-                                  image: const AssetImage(
-                                      "assets/images/placeholder.jpg"),
-                                  placeholder: const AssetImage(
-                                      "assets/images/placeholder.jpg"),
-                                ),
-                            errorWidget:
-                                (context, url, error) =>
-                                FadeInImage(
-                                  height: MediaQuery.of(context).size.height * 0.07,
-                                  width: MediaQuery.of(context).size.height * 0.07,
-                                  fit: BoxFit.fill,
-                                  image: const AssetImage(
-                                      "assets/images/error.png"),
-                                  placeholder: const AssetImage(
-                                      "assets/images/placeholder.jpg"),
-                                ),
+                                    height: 50,
+                                    width: 50,
+                                  );
+                                },
+                              ),
+                            ),
+                            placeholder: (context, url) => CircularProgressIndicator(color: orangeColor, strokeWidth: 0.8,),
+                            errorWidget: (context, url, error) =>
+                            const FadeInImage(
+                              height: 50,
+                              width: 50,
+                              fit: BoxFit.fill,
+                              image: AssetImage("assets/images/error.png"),
+                              placeholder:
+                              AssetImage("assets/images/placeholder.jpg"),
+                            ),
                           ),
                         ),
                       ),
@@ -326,52 +309,35 @@ class _SelectGroupUsersScreenState extends State<SelectGroupUsersScreen> {
                         width: MediaQuery.of(context).size.height * 0.07,
                         child: CachedNetworkImage(
                           imageUrl: cubit.filteredClerkList[index].clerkImage!,
-                          imageBuilder: (context,
-                              imageProvider) =>
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(96),
-                                child: FadeInImage(
-                                  height: MediaQuery.of(context).size.height * 0.07,
-                                  width: MediaQuery.of(context).size.height * 0.07,
-                                  //height: double.infinity,
-                                  //width: double.infinity,
+                          imageBuilder: (context, imageProvider) => ClipOval(
+                            child: FadeInImage(
+                              height: 50,
+                              width: 50,
+                              fit: BoxFit.fill,
+                              image: imageProvider,
+                              placeholder: const AssetImage(
+                                  "assets/images/placeholder.jpg"),
+                              imageErrorBuilder:
+                                  (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/error.png',
                                   fit: BoxFit.fill,
-                                  image: imageProvider,
-                                  placeholder: const AssetImage(
-                                      "assets/images/placeholder.jpg"),
-                                  imageErrorBuilder:
-                                      (context, error,
-                                      stackTrace) {
-                                    return Image.asset(
-                                      'assets/images/error.png',
-                                      fit: BoxFit.fill,
-                                      height: MediaQuery.of(context).size.height * 0.07,
-                                      width: MediaQuery.of(context).size.height * 0.07,
-                                    );
-                                  },
-                                ),
-                              ),
-                          placeholder: (context, url) =>
-                              FadeInImage(
-                                height: MediaQuery.of(context).size.height * 0.07,
-                                width: MediaQuery.of(context).size.height * 0.07,
-                                fit: BoxFit.fill,
-                                image: const AssetImage(
-                                    "assets/images/placeholder.jpg"),
-                                placeholder: const AssetImage(
-                                    "assets/images/placeholder.jpg"),
-                              ),
-                          errorWidget:
-                              (context, url, error) =>
-                              FadeInImage(
-                                height: MediaQuery.of(context).size.height * 0.07,
-                                width: MediaQuery.of(context).size.height * 0.07,
-                                fit: BoxFit.fill,
-                                image: const AssetImage(
-                                    "assets/images/error.png"),
-                                placeholder: const AssetImage(
-                                    "assets/images/placeholder.jpg"),
-                              ),
+                                  height: 50,
+                                  width: 50,
+                                );
+                              },
+                            ),
+                          ),
+                          placeholder: (context, url) => CircularProgressIndicator(color: orangeColor, strokeWidth: 0.8,),
+                          errorWidget: (context, url, error) =>
+                          const FadeInImage(
+                            height: 50,
+                            width: 50,
+                            fit: BoxFit.fill,
+                            image: AssetImage("assets/images/error.png"),
+                            placeholder:
+                            AssetImage("assets/images/placeholder.jpg"),
+                          ),
                         ),
                       ),
                     ),

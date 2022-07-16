@@ -23,6 +23,7 @@ import '../../../../shared/constants.dart';
 import '../../../../shared/gallery_item_thumbnail.dart';
 import '../../../../shared/gallery_item_wrapper_view.dart';
 import '../../../Chat/conversation/screens/chat_opened_image_screen.dart';
+import '../../../Chat/display/screens/display_chats_screen.dart';
 import '../../../Chat/widget/chat_UI.dart';
 import '../../../Chat/widget/intial.dart';
 import '../../../Chat/widget/page_manager.dart';
@@ -99,138 +100,144 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
         builder: (context, state) {
           var cubit = GroupConversationCubit.get(context);
 
-          return Scaffold(
-            appBar: AppBar(
-              systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarColor: Colors.transparent,
-                statusBarIconBrightness: Brightness.dark,
-                // For Android (dark icons)
-                statusBarBrightness: Brightness.light, // For iOS (dark icons)
-              ),
-              elevation: 0,
-              automaticallyImplyLeading: false,
-              backgroundColor: lightGreen.withOpacity(0.1),
-              flexibleSpace: SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.only(left: 2.0, right: 2.0),
-                  child: Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: Row(
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Transform.scale(
-                            scale: 1,
-                            child: const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Colors.black,
-                              size: 24,
+          return WillPopScope(
+            onWillPop: (){
+              finish(context, DisplayChatsScreen(initialIndex: 1,));
+              // ignore: null_argument_to_non_null_type
+              return Future.value();
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: Brightness.dark,
+                  // For Android (dark icons)
+                  statusBarBrightness: Brightness.light, // For iOS (dark icons)
+                ),
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                backgroundColor: veryLightGreen.withOpacity(0.1),
+                flexibleSpace: SafeArea(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Row(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              finish(context, DisplayChatsScreen(initialIndex: 1,));
+                            },
+                            icon: Transform.scale(
+                              scale: 1,
+                              child: const Icon(
+                                Icons.arrow_back_rounded,
+                                color: Colors.black,
+                                size: 24,
+                              ),
                             ),
                           ),
-                        ),
-
-                        CachedNetworkImage(
-                          imageUrl: widget.groupImage,
-                          imageBuilder: (context, imageProvider) => ClipOval(
-                            child: FadeInImage(
+                          CachedNetworkImage(
+                            imageUrl: widget.groupImage,
+                            imageBuilder: (context, imageProvider) => ClipOval(
+                              child: FadeInImage(
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.fill,
+                                image: imageProvider,
+                                placeholder: const AssetImage(
+                                    "assets/images/placeholder.jpg"),
+                                imageErrorBuilder:
+                                    (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/error.png',
+                                    fit: BoxFit.fill,
+                                    height: 50,
+                                    width: 50,
+                                  );
+                                },
+                              ),
+                            ),
+                            placeholder: (context, url) => CircularProgressIndicator(color: orangeColor, strokeWidth: 0.8,),
+                            errorWidget: (context, url, error) =>
+                                const FadeInImage(
                               height: 50,
                               width: 50,
                               fit: BoxFit.fill,
-                              image: imageProvider,
-                              placeholder: const AssetImage(
-                                  "assets/images/placeholder.jpg"),
-                              imageErrorBuilder:
-                                  (context, error, stackTrace) {
-                                return Image.asset(
-                                  'assets/images/error.png',
-                                  fit: BoxFit.fill,
-                                  height: 50,
-                                  width: 50,
-                                );
-                              },
+                              image: AssetImage("assets/images/error.png"),
+                              placeholder:
+                                  AssetImage("assets/images/placeholder.jpg"),
                             ),
                           ),
-                          placeholder: (context, url) => const CircularProgressIndicator(color: Colors.teal, strokeWidth: 0.8,),
-                          errorWidget: (context, url, error) =>
-                              const FadeInImage(
-                            height: 50,
-                            width: 50,
-                            fit: BoxFit.fill,
-                            image: AssetImage("assets/images/error.png"),
-                            placeholder:
-                                AssetImage("assets/images/placeholder.jpg"),
+                          const SizedBox(
+                            width: 18,
                           ),
-                        ),
-                        const SizedBox(
-                          width: 18,
-                        ),
-                        Flexible(
-                          //flex: 3,
-                          child: InkWell(
-                            onTap: (){
-                              cubit.navigateToDetails(context, widget.groupID, widget.groupName, widget.groupImage, widget.membersList, widget.adminsList);
-                            },
-                            splashColor: Colors.transparent,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  widget.groupName,
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontFamily: "Questv",
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black),
-                                ),
-                                const SizedBox(height: 2.0,),
-                                Flexible(
-                                  child: cubit.gotMembers ? ListView.builder(
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: cubit.groupMembersNameList.length,
-                                      itemBuilder: (context, index) =>
-                                          membersNameView(cubit, state, index)) : const Text(
-                                    "اضغط هنا لتفاصيل الجروب",
-                                    overflow: TextOverflow.ellipsis,
-                                    style:  TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        fontSize: 8,
+                          Flexible(
+                            //flex: 3,
+                            child: InkWell(
+                              onTap: (){
+                                cubit.navigateToDetails(context, widget.groupID, widget.groupName, widget.groupImage, widget.membersList, widget.adminsList);
+                              },
+                              splashColor: Colors.transparent,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    widget.groupName,
+                                    style: const TextStyle(
+                                        fontSize: 12,
                                         fontFamily: "Questv",
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.grey),
+                                        color: Colors.black),
                                   ),
-                                ),
+                                  const SizedBox(height: 2.0,),
+                                  Flexible(
+                                    child: cubit.gotMembers ? ListView.builder(
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: cubit.groupMembersNameList.length,
+                                        itemBuilder: (context, index) =>
+                                            membersNameView(cubit, state, index)) : const Text(
+                                      "اضغط هنا لتفاصيل الجروب",
+                                      overflow: TextOverflow.ellipsis,
+                                      style:  TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 8,
+                                          fontFamily: "Questv",
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey),
+                                    ),
+                                  ),
 
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16,),
-                      ],
+                          const SizedBox(width: 16,),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
+              body: Container(
+                color: veryLightGreen.withOpacity(0.1),
+                child: GroupChatUI(
+                  startRecord: () {},
+                  sendRecord: () {},
+                  deleteRecord: () {},
+                  allMessagesWidget: allMessagesWidget(cubit, state),
+                  textfield:
+                  textField(cubit, widget.groupID),
+                  groupID: widget.groupID,
+                  groupName: widget.groupName,
+                  cubit: cubit,
+                  messageController: messageController,),),
             ),
-            body: Container(
-              color: lightGreen.withOpacity(0.1),
-              child: GroupChatUI(
-                startRecord: () {},
-                sendRecord: () {},
-                deleteRecord: () {},
-                allMessagesWidget: allMessagesWidget(cubit, state),
-                textfield:
-                textField(cubit, widget.groupID),
-                groupID: widget.groupID,
-                groupName: widget.groupName,
-                cubit: cubit,
-                messageController: messageController,),),
           );
         },
       ),

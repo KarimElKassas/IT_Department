@@ -46,54 +46,6 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
   String searchQuery = "Search query";
   var searchController = TextEditingController();
 
-  Future<void> createChatList(BuildContext context, String receiverID,
-      String receiverName, String receiverImage, String receiverToken) async {
-    emit(DisplayChatsLoadingCreateChatState());
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await FirebaseFirestore.instance
-        .collection("ChatList")
-        .doc(prefs.getString("ClerkID"))
-        .collection("Chats")
-        .doc(receiverID)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        Map data = value.data()!;
-        chatID = data["ChatID"];
-      } else {
-        chatID = Random().nextInt(10000).toString();
-        Map<String, dynamic> chatListMap = HashMap();
-        chatListMap['ReceiverID'] = receiverID;
-        chatListMap['ReceiverName'] = receiverName;
-        chatListMap['ReceiverImage'] = receiverImage;
-        chatListMap['ReceiverToken'] = receiverToken;
-        chatListMap['ChatID'] = chatID;
-        chatListMap['LastMessage'] = "";
-        chatListMap['LastMessageType'] = "";
-        chatListMap['LastMessageTime'] = "";
-        chatListMap['LastMessageSender'] = "";
-        FirebaseFirestore.instance
-            .collection("ChatList")
-            .doc(prefs.getString("ClerkID"))
-            .collection("Chats")
-            .doc(receiverID)
-            .set(chatListMap)
-            .then((value) {
-          FirebaseFirestore.instance
-              .collection("ChatList")
-              .doc(receiverID)
-              .collection("Chats")
-              .doc(prefs.getString("ClerkID"))
-              .set(chatListMap)
-              .then((value) {
-            print("CHAT ID IN CORE CLERK DETAILS CUBIT : $chatID\n");
-          });
-        });
-      }
-    });
-    emit(DisplayChatsCreateChatSuccessState());
-  }
-
   void goToConversation(BuildContext context, route) async {
     Navigator.push(
         context,
@@ -109,9 +61,9 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     FirebaseFirestore.instance
-        .collection("GroupList")
-        .doc(prefs.getString("ClerkID"))
-        .collection("Groups")
+        .collection("Chats")
+        .where("ChatType", isEqualTo: "Group")
+        .where("MembersAndAdmins", arrayContains: prefs.getString("ClerkID").toString())
         .orderBy("TimeStamp", descending: true)
         .snapshots()
         .listen((event) async {
@@ -120,20 +72,22 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
       for (var element in event.docs) {
         if (element.exists) {
           Map data = element.data();
+          print("MEMBERS COUNT IS -> ${data["MembersCount"]}\n");
           print("Group INFOOOOOOO ::: $data\n");
           displayGroupModel = DisplayGroupsModel(
-              data["GroupID"],
-              data["GroupName"],
-              data["GroupImageUrl"],
+              data["ChatID"],
+              data["ChatName"],
+              data["ChatImageUrl"],
               data["MembersCount"],
-              data["GroupLastMessage"],
-              data["GroupLastMessageTime"],
-              data["GroupLastMessageType"],
-              data["GroupLastMessageSenderID"],
-              data["GroupUnReadCount"],
-              data["GroupPartnerState"],
+              data["ChatLastMessage"],
+              data["ChatLastMessageTime"],
+              data["ChatLastMessageType"],
+              data["ChatLastMessageSenderID"],
+              data["ChatUnReadCount"],
+              data["ChatPartnerState"],
               data["Members"],
               data["Admins"],
+              data["MembersAndAdmins"],
           );
           groupList.add(displayGroupModel!);
           filteredGroupList = groupList.toList();
@@ -144,9 +98,9 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
     });
 
     FirebaseFirestore.instance
-        .collection("ChatList")
-        .doc(prefs.getString("ClerkID"))
         .collection("Chats")
+        .where("ChatType", isEqualTo: "Single")
+        .where("Members", arrayContains: prefs.getString("ClerkID").toString())
         .orderBy("TimeStamp", descending: true)
         .snapshots()
         .listen((event) async {
@@ -169,7 +123,9 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
               data["LastMessageType"].toString(),
               data["LastMessageSender"].toString(),
               data["UnReadMessagesCount"].toString(),
-              data["PartnerState"].toString());
+              data["PartnerState"].toString(),
+              data["Members"],
+          );
           await FirebaseFirestore.instance
               .collection("Clerks")
               .doc(data["ReceiverID"])

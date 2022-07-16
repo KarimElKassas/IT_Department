@@ -4,12 +4,23 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:ui' as ui;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:transition_plus/transition_plus.dart';
 
 void navigateTo(context, widget) =>
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget));
 
 void navigateAndFinish(context, widget) => Navigator.pushReplacement(
     context, MaterialPageRoute(builder: (context) => widget));
+
+void finish(BuildContext context, route) {
+  Navigator.pushReplacement(
+      context,
+      ScaleTransition1(
+          page: route,
+          startDuration: const Duration(milliseconds: 1500),
+          closeDuration: const Duration(milliseconds: 800),
+          type: ScaleTrasitionTypes.center));
+}
 
 Widget defaultButton({
   double width = double.infinity,

@@ -35,7 +35,32 @@ class ClerkLoginCubit extends Cubit<ClerkLoginStates>{
 
     emit(ClerkLoginChangePassVisibility());
   }
+  void signManual(BuildContext context)async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("ClerkID", "3020");
+    await prefs.setString("ClerkName", "كريم محمد السيد إسماعيل");
+    await prefs.setString("ClerkPassword", "123456");
+    await prefs.setString("ClerkNumber", "3020");
+    await prefs.setString("ClerkPhone", "01017268676");
+    await prefs.setString("ClerkManagementID", "1028");
+    await prefs.setString("ClerkManagementName", "إدارة الرقمنة");
+    await prefs.setString("ClerkTypeName", "مدنيين");
+    await prefs.setString("ClerkRankName", "مدنى");
+    await prefs.setString("ClerkCategoryName", "مدنيين");
+    await prefs.setString("ClerkCoreStrengthName","الضبعة");
+    await prefs.setString("ClerkPresenceName", "الضبعة");
+    await prefs.setString("ClerkJobName", "مبرمج");
+    await prefs.setStringList("ClerkSubscriptions", []);
+    var token = await FirebaseMessaging.instance.getToken();
 
+    Map<String, dynamic> dataMap = HashMap();
+    dataMap["ClerkToken"] = token;
+    await FirebaseFirestore.instance.collection("Clerks").doc("3020").update(dataMap);
+    await prefs.setString("ClerkToken", token??"");
+
+    finish(context, const HomeScreen());
+    emit(ClerkLoginSuccessState());
+  }
   void signInUser(BuildContext context, String personNumber, String userPassword) async {
     emit(ClerkLoginLoadingSignIn());
 

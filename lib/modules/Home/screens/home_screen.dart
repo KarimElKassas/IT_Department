@@ -340,7 +340,7 @@ class HomeScreen extends StatelessWidget {
                               children: [
                                 InkWell(
                                   onTap: (){
-                                    cubit.navigate(context, DisplayChatsScreen());
+                                    cubit.navigate(context, DisplayChatsScreen(initialIndex: 0,));
                                   },
                                   child: Container(
                                     width: MediaQuery.of(

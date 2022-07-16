@@ -11,7 +11,8 @@ class DisplayChatModel {
   String lastMessageSender = "";
   String unreadMessagesCount = "";
   String partnerState = "";
+  List<Object?> membersList = [];
 
-  DisplayChatModel(this.userID, this.userName, this.userImage, this.userToken, this.chatID, this.lastMessage, this.lastMessageTime, this.lastMessageType, this.lastMessageSender, this.unreadMessagesCount, this.partnerState);
+  DisplayChatModel(this.userID, this.userName, this.userImage, this.userToken, this.chatID, this.lastMessage, this.lastMessageTime, this.lastMessageType, this.lastMessageSender, this.unreadMessagesCount, this.partnerState, this.membersList);
 
 }

@@ -243,8 +243,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
 
-    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
-    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
+    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
 
     messageControllerValue.value = "";
     messageController.clear();
@@ -276,18 +275,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
     chatListMap["TimeStamp"] = Timestamp.now();
 
-    Map<String, dynamic> chatListMap2 = HashMap();
-    chatListMap2['ReceiverID'] = userID;
-    chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
-    chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
-    chatListMap2["ReceiverToken"] = receiverToken;
-    chatListMap2['LastMessage'] = message;
-    chatListMap2['LastMessageType'] = type;
-    chatListMap2['LastMessageTime'] = currentTime;
-    chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
-    chatListMap2["TimeStamp"] = Timestamp.now();
-
-    print("Clerk Image : ${prefs.getString("ClerkImage")}\n");
 
     FirebaseFirestore.instance
         .collection("Chats")
@@ -299,7 +286,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
       sendNotification(message, currentTime, userToken);
       chatListRef.update(chatListMap);
-      chatListTwoRef.update(chatListMap2);
       emit(ConversationSendMessageState());
     });
   }
@@ -314,8 +300,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
     var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child("Documents");
     var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages");
-    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
-    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
+    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
@@ -352,17 +337,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
     chatListMap["TimeStamp"] = Timestamp.now();
 
-    Map<String, dynamic> chatListMap2 = HashMap();
-    chatListMap2['ReceiverID'] = userID;
-    chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
-    chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
-    chatListMap2["ReceiverToken"] = receiverToken;
-    chatListMap2['LastMessage'] = file.files.last;
-    chatListMap2['LastMessageType'] = "file";
-    chatListMap2['LastMessageTime'] = currentTime;
-    chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
-    chatListMap2["TimeStamp"] = Timestamp.now();
-
       ref.doc(currentFullTime).set(dataMap).then((value) async {
         uploadingFileName = currentFullTime;
         String fileName = file.files.first.path.toString();
@@ -377,7 +351,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
             ref.doc(currentFullTime).update(dataMap).then((value){
               chatListRef.update(chatListMap);
-              chatListTwoRef.update(chatListMap2);
               uploadingFileName = "";
               emit(ConversationSendFilesSuccessState());
             }).catchError((error){
@@ -413,8 +386,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
     var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child(currentFullTime);
     var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages").doc(currentFullTime);
-    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
-    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
+    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
 
     List<String> urlsList = [];
 
@@ -467,22 +439,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
               chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
               chatListMap["TimeStamp"] = Timestamp.now();
 
-              Map<String, dynamic> chatListMap2 = HashMap();
-              chatListMap2['ReceiverID'] = userID;
-              chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
-              chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
-              chatListMap2["ReceiverToken"] = receiverToken;
-              chatListMap2['LastMessage'] = message;
-              chatListMap2['LastMessageType'] = messageType;
-              chatListMap2['LastMessageTime'] = currentTime;
-              chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
-              chatListMap2["TimeStamp"] = Timestamp.now();
-
-              print("Clerk Image : ${prefs.getString("ClerkImage")}\n");
               chatListRef.update(chatListMap);
-              chatListTwoRef.update(chatListMap2);
-
-
               emit(ConversationSendImagesSuccessState());
             }).catchError((error){
               print("UPLOAD ERROR : $error\n");
@@ -646,6 +603,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
     var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child("Records").child(audioPathStore);
     var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages");
+    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
@@ -686,17 +644,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
     chatListMap["TimeStamp"] = Timestamp.now();
 
-    Map<String, dynamic> chatListMap2 = HashMap();
-    chatListMap2['ReceiverID'] = userID;
-    chatListMap2['ReceiverName'] = prefs.getString("ClerkName");
-    chatListMap2['ReceiverImage'] = prefs.getString("ClerkImage");
-    chatListMap2["ReceiverToken"] = receiverToken;
-    chatListMap2['LastMessage'] = "ملف صوتى";
-    chatListMap2['LastMessageType'] = "audio";
-    chatListMap2['LastMessageTime'] = currentTime;
-    chatListMap2['LastMessageSender'] = prefs.getString('ClerkID');
-    chatListMap2["TimeStamp"] = Timestamp.now();
-
     ref.doc(currentFullTime).set(dataMap).then((value) async {
       uploadingRecordName = currentFullTime;
 
@@ -708,32 +655,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
           ref.doc(currentFullTime).update(dataMap).then((value)async {
             uploadingRecordName = "";
-            await FirebaseFirestore.instance
-                .collection("ChatList")
-                .doc(userID)
-                .collection('Chats')
-                .doc(receiverID)
-                .get()
-                .then((value) async {
-              if (value.exists) {
-                Map data = value.data()!;
-                print("Chat Exist with ID ${data["ChatID"]}\n");
-                chatID = data["ChatID"];
-                chatListMap['ChatID'] = chatID;
-                await FirebaseFirestore.instance
-                    .collection("ChatList")
-                    .doc(userID)
-                    .collection('Chats')
-                    .doc(receiverID)
-                    .update(chatListMap);
-                await FirebaseFirestore.instance
-                    .collection("ChatList")
-                    .doc(receiverID)
-                    .collection('Chats')
-                    .doc(userID)
-                    .update(chatListMap2);
-              }
-            });
+            chatListRef.update(chatListMap);
             emit(ConversationSendFilesSuccessState());
           }).catchError((error){
             print("UPLOAD ERROR : $error\n");

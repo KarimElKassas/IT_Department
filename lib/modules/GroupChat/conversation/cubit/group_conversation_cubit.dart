@@ -20,6 +20,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transition_plus/transition_plus.dart';
 
 import '../../../../models/chat_model.dart';
 import '../../../../models/group_chat_model.dart';
@@ -315,10 +316,10 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
     dataMap["fileSize"] = "0 KB";
 
     Map<String, dynamic> chatListMap = HashMap();
-    chatListMap['GroupLastMessage'] = message;
-    chatListMap['GroupLastMessageType'] = type;
-    chatListMap['GroupLastMessageTime'] = currentTime;
-    chatListMap['GroupLastMessageSenderID'] = userID;
+    chatListMap['ChatLastMessage'] = message;
+    chatListMap['ChatLastMessageType'] = type;
+    chatListMap['ChatLastMessageTime'] = currentTime;
+    chatListMap['ChatLastMessageSenderID'] = userID;
     chatListMap["TimeStamp"] = Timestamp.now();
 
 
@@ -331,13 +332,10 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
         .then((value) async {
 
       sendNotification(message, currentTime, groupID, userName);
-      print("GROUP LIST LENGTH : ${groupMembersList.length}\n");
-      for(var element in groupMembersList){
-        FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-      }
-      for(var element in groupAdminsList){
-        FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-      }
+      FirebaseFirestore.instance
+      .collection("Chats")
+      .doc(groupID)
+      .update(chatListMap);
       emit(GroupConversationSendMessageState());
     });
   }
@@ -417,10 +415,10 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
 
 
     Map<String, dynamic> chatListMap = HashMap();
-    chatListMap['GroupLastMessage'] = file.files.first.name;
-    chatListMap['GroupLastMessageType'] = "file";
-    chatListMap['GroupLastMessageTime'] = currentTime;
-    chatListMap['GroupLastMessageSenderID'] = userID;
+    chatListMap['ChatLastMessage'] = file.files.first.name;
+    chatListMap['ChatLastMessageType'] = "file";
+    chatListMap['ChatLastMessageTime'] = currentTime;
+    chatListMap['ChatLastMessageSenderID'] = userID;
     chatListMap["TimeStamp"] = Timestamp.now();
 
     if(file.files.first.size > 1000000){
@@ -442,12 +440,10 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
           dataMap['Message'] = value.toString();
 
           ref.doc(currentFullTime).update(dataMap).then((value){
-            for(var element in groupMembersList){
-              FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-            }
-            for(var element in groupAdminsList){
-              FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-            }
+            FirebaseFirestore.instance
+                .collection("Chats")
+                .doc(groupID)
+                .update(chatListMap);
             uploadingFileName = "";
             emit(GroupConversationSendFilesSuccessState());
           }).catchError((error){
@@ -527,18 +523,16 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
               uploadingImageName = "";
 
               Map<String, dynamic> chatListMap = HashMap();
-              chatListMap['GroupLastMessage'] = message;
-              chatListMap['GroupLastMessageType'] = messageType;
-              chatListMap['GroupLastMessageTime'] = currentTime;
-              chatListMap['GroupLastMessageSenderID'] = userID;
+              chatListMap['ChatLastMessage'] = message;
+              chatListMap['ChatLastMessageType'] = messageType;
+              chatListMap['ChatLastMessageTime'] = currentTime;
+              chatListMap['ChatLastMessageSenderID'] = userID;
               chatListMap["TimeStamp"] = Timestamp.now();
 
-              for(var element in groupMembersList){
-                FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-              }
-              for(var element in groupAdminsList){
-                FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-              }
+              FirebaseFirestore.instance
+                  .collection("Chats")
+                  .doc(groupID)
+                  .update(chatListMap);
               emit(GroupConversationSendImagesSuccessState());
             }).catchError((error){
               print("UPLOAD ERROR : $error\n");
@@ -609,10 +603,10 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
       dataMap["fileSize"] = "${(audioFile.lengthSync() * 0.001).toStringAsFixed(2)} KB";
     }
     Map<String, dynamic> chatListMap = HashMap();
-    chatListMap['GroupLastMessage'] = "ملف صوتى";
-    chatListMap['GroupLastMessageType'] = "audio";
-    chatListMap['GroupLastMessageTime'] = currentTime;
-    chatListMap['GroupLastMessageSenderID'] = userID;
+    chatListMap['ChatLastMessage'] = "ملف صوتى";
+    chatListMap['ChatLastMessageType'] = "audio";
+    chatListMap['ChatLastMessageTime'] = currentTime;
+    chatListMap['ChatLastMessageSenderID'] = userID;
     chatListMap["TimeStamp"] = Timestamp.now();
 
     ref.doc(currentFullTime).set(dataMap).then((value) async {
@@ -626,12 +620,10 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
 
           ref.doc(currentFullTime).update(dataMap).then((value)async {
             uploadingRecordName = "";
-            for(var element in groupMembersList){
-              FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-            }
-            for(var element in groupAdminsList){
-              FirebaseFirestore.instance.collection("GroupList").doc(element!.toString()).collection("Groups").doc(groupID).update(chatListMap);
-            }
+            FirebaseFirestore.instance
+                .collection("Chats")
+                .doc(groupID)
+                .update(chatListMap);
             emit(GroupConversationSendFilesSuccessState());
           }).catchError((error){
             print("UPLOAD ERROR : $error\n");

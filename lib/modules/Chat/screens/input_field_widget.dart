@@ -65,6 +65,7 @@ class _InputFieldWidgetState extends State<InputFieldWidget> {
                               keyboardType: TextInputType.multiline,
                               textInputAction: TextInputAction.newline,
                               textDirection: TextDirection.rtl,
+                              autofocus: false,
                               style: TextStyle(
                                   color: lightGreen, fontFamily: "Questv", fontSize: 14),
                               maxLines: 3,

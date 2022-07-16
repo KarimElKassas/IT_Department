@@ -161,7 +161,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    FirebaseFirestore.instance.collection("Clerks").snapshots().listen((event) {
+    FirebaseFirestore.instance.collection("Clerks").where("ClerkID", isNotEqualTo: prefs.getString("ClerkID").toString()).snapshots().listen((event) {
       clerkList.clear();
       clerkSubscriptionsList = [];
       filteredClerkList.clear();
@@ -328,6 +328,10 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
     dataMap['ChatLastMessageTime'] = "";
     dataMap['ChatLastMessageType'] = "";
     dataMap['ChatImageUrl'] = "";
+    dataMap['ChatUnReadCount'] = "";
+    dataMap['ChatPartnerState'] = "";
+    dataMap['MembersCount'] = (groupAdminsList + selectedClerksIDList).toString();
+    dataMap['MembersAndAdmins'] = (groupAdminsList + selectedClerksIDList).toList();
 
     groupRef.doc(currentFullTime).set(dataMap).then((value) async {
       String fileName = imageUrl;

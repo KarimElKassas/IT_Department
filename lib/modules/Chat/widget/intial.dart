@@ -7,6 +7,7 @@ import 'package:it_department/modules/Chat/conversation/cubit/conversation_state
 import 'package:it_department/modules/Chat/conversation/screens/conversation_screen.dart';
 import 'package:it_department/modules/Chat/widget/page_manager.dart';
 import 'package:it_department/shared/components.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../../shared/constants.dart';
 
@@ -128,14 +129,26 @@ class VoiceWidget extends StatefulWidget {
 class _VoiceWidgetState extends State<VoiceWidget> {
   @override
   void initState() {
-    widget.pageManager.play( );
+    if(widget.pageManager.audioPlayer.position>const Duration(milliseconds: 1))
+    {
+
+    }else{
+      widget.pageManager.play( );
+    }
     // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    urlint = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+    print('state is ${widget.pageManager.audioPlayer.position } \n \n \n');
+    if(widget.pageManager.audioPlayer.position>const Duration(milliseconds: 1))
+      {
+
+      }else{
+      urlint = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+    }
+
     super.dispose();
   }
 

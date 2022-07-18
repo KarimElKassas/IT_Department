@@ -44,8 +44,19 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
   bool isSearching = false;
   String searchText = "";
   String searchQuery = "Search query";
+  String myID = "";
+  String myName = "";
+  String myImage = "";
   var searchController = TextEditingController();
 
+  void getMyData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    myID = prefs.getString("ClerkID").toString();
+    myName = prefs.getString("ClerkName").toString();
+    myImage = prefs.getString("ClerkImage").toString();
+
+  }
   void goToConversation(BuildContext context, route) async {
     Navigator.push(
         context,
@@ -83,6 +94,7 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
               data["ChatLastMessageTime"],
               data["ChatLastMessageType"],
               data["ChatLastMessageSenderID"],
+              data["ChatLastMessageSenderName"],
               data["ChatUnReadCount"],
               data["ChatPartnerState"],
               data["Members"],
@@ -121,7 +133,8 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
               data["LastMessage"].toString(),
               data["LastMessageTime"].toString(),
               data["LastMessageType"].toString(),
-              data["LastMessageSender"].toString(),
+              data["LastMessageSenderID"].toString(),
+              data["LastMessageSenderName"].toString(),
               data["UnReadMessagesCount"].toString(),
               data["PartnerState"].toString(),
               data["Members"],

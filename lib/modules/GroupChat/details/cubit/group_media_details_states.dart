@@ -1,0 +1,11 @@
+abstract class GroupMediaDetailsStates{}
+
+class GroupMediaDetailsInitialState extends GroupMediaDetailsStates{}
+
+class GroupMediaDetailsFilterMediaState extends GroupMediaDetailsStates{}
+
+class GroupMediaDetailsLoadingDownloadFileState extends GroupMediaDetailsStates{}
+
+class GroupMediaDetailsDownloadFileSuccessState extends GroupMediaDetailsStates{}
+
+class GroupMediaDetailsDownloadFilePermissionDeniedState extends GroupMediaDetailsStates{}

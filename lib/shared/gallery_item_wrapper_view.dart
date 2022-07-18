@@ -12,15 +12,19 @@ class GalleryImageWrapper extends StatefulWidget {
   final int? initialIndex;
   final PageController pageController;
   final List<dynamic> galleryItems;
+  final List<Map<String, dynamic>>? customList;
   final Axis scrollDirection;
   final String? titleGallery;
+  final AppBar? appBar;
 
   GalleryImageWrapper({Key? key,
+    this.appBar,
     this.loadingBuilder,
     this.titleGallery,
     this.backgroundDecoration,
     this.initialIndex,
     required this.galleryItems,
+    this.customList,
     this.scrollDirection = Axis.horizontal,
   }) : pageController = PageController(initialPage: initialIndex ?? 0), super(key: key);
 
@@ -36,8 +40,7 @@ class _GalleryImageWrapperState extends State<GalleryImageWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      appBar: AppBar(
+      appBar: widget.appBar??AppBar(
         title: Text(""),
         toolbarHeight: 0,
         elevation: 0,
@@ -49,20 +52,22 @@ class _GalleryImageWrapperState extends State<GalleryImageWrapper> {
           statusBarBrightness: Brightness.dark, // For iOS (dark icons)
         ),
       ),
-      body: Container(
-        decoration: widget.backgroundDecoration,
-        constraints: BoxConstraints.expand(
-          height: MediaQuery.of(context).size.height,
-        ),
-        child: PhotoViewGallery.builder(
-          enableRotation: true,
-          scrollPhysics: const BouncingScrollPhysics(),
-          builder: _buildImage,
-          itemCount: widget.galleryItems.length,
-          loadingBuilder: widget.loadingBuilder,
-          backgroundDecoration: widget.backgroundDecoration,
-          pageController: widget.pageController,
-          scrollDirection: widget.scrollDirection,
+      body: SafeArea(
+        child: Container(
+          decoration: widget.backgroundDecoration,
+          constraints: BoxConstraints.expand(
+            height: MediaQuery.of(context).size.height,
+          ),
+          child: PhotoViewGallery.builder(
+            enableRotation: true,
+            scrollPhysics: const BouncingScrollPhysics(),
+            builder: _buildImage,
+            itemCount: widget.customList != null ? widget.customList!.length : widget.galleryItems.length,
+            loadingBuilder: widget.loadingBuilder,
+            backgroundDecoration: widget.backgroundDecoration,
+            pageController: widget.pageController,
+            scrollDirection: widget.scrollDirection,
+          ),
         ),
       ),
     );
@@ -72,7 +77,7 @@ class _GalleryImageWrapperState extends State<GalleryImageWrapper> {
   PhotoViewGalleryPageOptions _buildImage(BuildContext context, int index) {
     return PhotoViewGalleryPageOptions.customChild(
       child: CachedNetworkImage(
-        imageUrl: widget.galleryItems[index]!.toString(),
+        imageUrl: widget.customList != null ? widget.customList![index]["URL"]!.toString() : widget.galleryItems[index]!.toString(),
         placeholder: (context, url) =>
             const Center(child: CircularProgressIndicator(color: Colors.teal, strokeWidth: 0.8,)),
         errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -80,7 +85,7 @@ class _GalleryImageWrapperState extends State<GalleryImageWrapper> {
       initialScale: PhotoViewComputedScale.contained,
       minScale: minScale,
       maxScale: maxScale,
-      heroAttributes: PhotoViewHeroAttributes(tag: widget.galleryItems[index]!.toString()),
+      heroAttributes: PhotoViewHeroAttributes(tag: widget.customList != null ? widget.customList![index]["URL"]!.toString() : widget.galleryItems[index]!.toString()),
     );
   }
 }

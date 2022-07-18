@@ -239,7 +239,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
     String currentTime = DateFormat("hh:mm a").format(now);
     String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
 
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
 
@@ -274,7 +273,6 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessageTime'] = currentTime;
     chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
     chatListMap["TimeStamp"] = Timestamp.now();
-
 
     FirebaseFirestore.instance
         .collection("Chats")

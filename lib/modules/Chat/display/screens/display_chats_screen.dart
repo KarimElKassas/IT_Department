@@ -23,168 +23,165 @@ class DisplayChatsScreen extends StatelessWidget {
   int initialIndex;
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => DisplayChatsCubit()..getChats(),
-      child: BlocConsumer<DisplayChatsCubit, DisplayChatsStates>(
-        listener: (context, state) {},
-        builder: (context, state) {
-          var cubit = DisplayChatsCubit.get(context);
+    return BlocConsumer<DisplayChatsCubit, DisplayChatsStates>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        var cubit = DisplayChatsCubit.get(context);
 
-          return WillPopScope(
-            onWillPop: (){
-              finish(context, const HomeScreen());
+        return WillPopScope(
+          onWillPop: (){
+            finish(context, const HomeScreen());
 
-              return Future.value();
-            },
-            child: Directionality(
-              textDirection: TextDirection.rtl,
-              child: DefaultTabController(
-                initialIndex: initialIndex,
-                  length: 2,
-                  child: Container(
-                    height: 100.h,
-                    color: veryLightGreen.withOpacity(0.1),
-                    child: Scaffold(
-                      appBar: AppBar(
-                          systemOverlayStyle: const SystemUiOverlayStyle(
-                            statusBarColor: Colors.transparent,
-                            statusBarIconBrightness: Brightness.dark,
-                            // For Android (dark icons)
-                            statusBarBrightness:
-                                Brightness.light, // For iOS (dark icons)
-                          ),
-                          elevation: 0.0,
-                          automaticallyImplyLeading: false,
-                          backgroundColor: veryLightGreen.withOpacity(0.1),
-                          title: !cubit.isSearching ? Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const AutoSizeText(
-                                  "مشروع مستقبل مصر",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Questv",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600),
-                                  minFontSize: 14,
-                                ),
-                                const Spacer(),
-                                GestureDetector(
-                                  onTap: (){
-                                    cubit.startSearch(context);
-                                  },
-                                  child: const Icon(
-                                    IconlyBroken.search,
+            return Future.value();
+          },
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: DefaultTabController(
+              initialIndex: initialIndex,
+                length: 2,
+                child: Container(
+                  height: 100.h,
+                  color: veryLightGreen.withOpacity(0.1),
+                  child: Scaffold(
+                    appBar: AppBar(
+                        systemOverlayStyle: const SystemUiOverlayStyle(
+                          statusBarColor: Colors.transparent,
+                          statusBarIconBrightness: Brightness.dark,
+                          // For Android (dark icons)
+                          statusBarBrightness:
+                              Brightness.light, // For iOS (dark icons)
+                        ),
+                        elevation: 0.0,
+                        automaticallyImplyLeading: false,
+                        backgroundColor: veryLightGreen.withOpacity(0.1),
+                        title: !cubit.isSearching ? Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const AutoSizeText(
+                                "مشروع مستقبل مصر",
+                                style: TextStyle(
                                     color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ) : Builder(
-                            builder: (context) {
-                              return _buildSearchField(cubit, context);
-                            }
-                          ),
-                          bottom: const TabBar(
-                            physics: BouncingScrollPhysics(),
-                            indicatorColor: Colors.black,
-                            indicatorWeight: 0.8,
-                            tabs: [
-                              Tab(
-                                child: Text('المحادثات',
-                                  style: TextStyle(color: Colors.black, fontSize: 14, fontFamily: "Questv"),),
+                                    fontFamily: "Questv",
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                                minFontSize: 14,
                               ),
-                              Tab(
-                                child: Text('المجموعات', style: TextStyle(color: Colors.black, fontSize: 14, fontFamily: "Questv"),),
+                              const Spacer(),
+                              GestureDetector(
+                                onTap: (){
+                                  cubit.startSearch(context);
+                                },
+                                child: const Icon(
+                                  IconlyBroken.search,
+                                  color: Colors.black,
+                                ),
                               ),
                             ],
                           ),
-                      ),
-                        floatingActionButton: FadeInUp(
-                          duration: const Duration(seconds: 1),
-                          child: Builder(
-                            builder: (context) {
-                              return FloatingActionButton(
-                                onPressed: () {
-                                    if(DefaultTabController.of(context)!.index == 0){
-                                      showToast(message: "جاية ف السكة يا حمادة ...", length: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 3);
-                                    }else{
-                                      cubit.navigate(context, const SelectGroupUsersScreen());
-                                    }
-                                },
-                                child: const Icon(
-                                  Icons.chat_rounded,
-                                  color: Colors.white,
-                                ),
-                                backgroundColor: lightGreen,
-                                elevation: 15.0,
-                              );
-                            }
-                          ),
+                        ) : Builder(
+                          builder: (context) {
+                            return _buildSearchField(cubit, context);
+                          }
                         ),
-                      body: Container(
-                        color: veryLightGreen.withOpacity(0.1),
-                        child: TabBarView(
-                            children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                            child: BuildCondition(
-                              condition: state is DisplayChatsLoadingChatsState,
-                              builder: (context) => Center(
-                                child: CircularProgressIndicator(
-                                  color: lightGreen,
-                                  strokeWidth: 0.8,
-                                ),
+                        bottom: const TabBar(
+                          physics: BouncingScrollPhysics(),
+                          indicatorColor: Colors.black,
+                          indicatorWeight: 0.8,
+                          tabs: [
+                            Tab(
+                              child: Text('المحادثات',
+                                style: TextStyle(color: Colors.black, fontSize: 14, fontFamily: "Questv"),),
+                            ),
+                            Tab(
+                              child: Text('المجموعات', style: TextStyle(color: Colors.black, fontSize: 14, fontFamily: "Questv"),),
+                            ),
+                          ],
+                        ),
+                    ),
+                      floatingActionButton: FadeInUp(
+                        duration: const Duration(seconds: 1),
+                        child: Builder(
+                          builder: (context) {
+                            return FloatingActionButton(
+                              onPressed: () {
+                                  if(DefaultTabController.of(context)!.index == 0){
+                                    showToast(message: "جاية ف السكة يا حمادة ...", length: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 3);
+                                  }else{
+                                    cubit.navigate(context, const SelectGroupUsersScreen());
+                                  }
+                              },
+                              child: const Icon(
+                                Icons.chat_rounded,
+                                color: Colors.white,
                               ),
-                              fallback: (context) => ListView.separated(
-                                shrinkWrap: true,
-                                physics: const BouncingScrollPhysics(),
-                                scrollDirection: Axis.vertical,
-                                itemBuilder: (context, index) =>
-                                    listItem(context, cubit, state, index),
-                                separatorBuilder: (context, index) => const Divider(
-                                  thickness: 0.4,
-                                  color: Colors.grey,
-                                ),
-                                itemCount: cubit.filteredChatList.length,
+                              backgroundColor: lightGreen,
+                              elevation: 15.0,
+                            );
+                          }
+                        ),
+                      ),
+                    body: Container(
+                      color: veryLightGreen.withOpacity(0.1),
+                      child: TabBarView(
+                          children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+                          child: BuildCondition(
+                            condition: state is DisplayChatsLoadingChatsState,
+                            builder: (context) => Center(
+                              child: CircularProgressIndicator(
+                                color: lightGreen,
+                                strokeWidth: 0.8,
                               ),
                             ),
+                            fallback: (context) => ListView.separated(
+                              shrinkWrap: true,
+                              physics: const BouncingScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (context, index) =>
+                                  listItem(context, cubit, state, index),
+                              separatorBuilder: (context, index) => const Divider(
+                                thickness: 0.4,
+                                color: Colors.grey,
+                              ),
+                              itemCount: cubit.filteredChatList.length,
+                            ),
                           ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                                child: BuildCondition(
-                                  condition: state is DisplayChatsLoadingChatsState,
-                                  builder: (context) => const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.black,
-                                      strokeWidth: 0.8,
-                                    ),
-                                  ),
-                                  fallback: (context) => ListView.separated(
-                                    shrinkWrap: true,
-                                    physics: const BouncingScrollPhysics(),
-                                    scrollDirection: Axis.vertical,
-                                    itemBuilder: (context, listIndex) =>
-                                        groupListItem(context, cubit, state, listIndex),
-                                    separatorBuilder: (context, index) => const Divider(
-                                      thickness: 0.4,
-                                      color: Colors.grey,
-                                    ),
-                                    itemCount: cubit.filteredGroupList.length,
+                        ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+                              child: BuildCondition(
+                                condition: state is DisplayChatsLoadingChatsState,
+                                builder: (context) => const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.black,
+                                    strokeWidth: 0.8,
                                   ),
                                 ),
+                                fallback: (context) => ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const BouncingScrollPhysics(),
+                                  scrollDirection: Axis.vertical,
+                                  itemBuilder: (context, listIndex) =>
+                                      groupListItem(context, cubit, state, listIndex),
+                                  separatorBuilder: (context, index) => const Divider(
+                                    thickness: 0.4,
+                                    color: Colors.grey,
+                                  ),
+                                  itemCount: cubit.filteredGroupList.length,
+                                ),
                               ),
-                        ]),
-                      ),
+                            ),
+                      ]),
                     ),
-                  )),
-            ),
-          );
-        },
-      ),
+                  ),
+                )),
+          ),
+        );
+      },
     );
   }
 
@@ -474,7 +471,7 @@ class DisplayChatsScreen extends StatelessWidget {
                   ),
                   cubit.filteredChatList[index].lastMessageType == "Text"
                       ? AutoSizeText(
-                          cubit.filteredChatList[index].lastMessage,
+                           cubit.filteredChatList[index].lastMessage,
                           style: const TextStyle(
                             color: Colors.grey,
                             fontFamily: "Questv",
@@ -786,7 +783,7 @@ class DisplayChatsScreen extends StatelessWidget {
                   ),
                   cubit.filteredGroupList[index].lastMessageType == "Text"
                       ? AutoSizeText(
-                    cubit.filteredGroupList[index].lastMessage,
+                    cubit.filteredGroupList[index].lastMessageSenderID == cubit.myID ? cubit.filteredGroupList[index].lastMessage : "${cubit.filteredGroupList[index].lastMessageSenderName} : ${cubit.filteredGroupList[index].lastMessage}",
                     style: const TextStyle(
                       color: Colors.grey,
                       fontFamily: "Questv",

@@ -87,11 +87,11 @@ class _IntialScreenState extends State<IntialScreen> {
     );
   }
 
-  Widget voiceNote(String urls, String totalDuration) {
+  Widget voiceNote(String urls, String totalDuration, Color progressBarColor, Color progressBarSecondColor, Color iconColor, Color fontColor) {
     return BuildCondition(
       condition: urlint == urls,
       builder: (ctx) {
-        return VoiceWidget(pageManager: _pageManager);
+        return VoiceWidget(pageManager: _pageManager, progressbarColor: progressBarColor, progressbarSecondColor: progressBarSecondColor, iconColor: iconColor, fontColor: fontColor,);
       },
       fallback: (ctx) {
         return VoiceConstWidget(
@@ -112,6 +112,10 @@ class _IntialScreenState extends State<IntialScreen> {
             );
           },
           totalDuration: totalDuration,
+          iconColor: iconColor,
+          progressbarColor: progressBarColor,
+          progressbarSecondColor: progressBarSecondColor,
+          fontColor: fontColor,
         );
       },
     );
@@ -119,9 +123,9 @@ class _IntialScreenState extends State<IntialScreen> {
 }
 
 class VoiceWidget extends StatefulWidget {
-  const VoiceWidget({Key? key, required this.pageManager}) : super(key: key);
+  const VoiceWidget({Key? key, required this.pageManager, required this.progressbarColor, required this.iconColor, required this.progressbarSecondColor, required this.fontColor}) : super(key: key);
   final PageManager pageManager;
-
+  final Color progressbarColor, progressbarSecondColor, iconColor, fontColor;
   @override
   _VoiceWidgetState createState() => _VoiceWidgetState();
 }
@@ -167,7 +171,7 @@ class _VoiceWidgetState extends State<VoiceWidget> {
                     return Padding(
                       padding: const EdgeInsets.all(2.0),
                       child: CircularProgressIndicator(
-                        color: white,
+                        color: widget.progressbarColor,
                         strokeWidth: 0.8,
                       ),
                     );
@@ -176,7 +180,7 @@ class _VoiceWidgetState extends State<VoiceWidget> {
                         onTap: widget.pageManager.play,
                         child: Icon(
                           Icons.play_arrow_rounded,
-                          color: white,
+                          color: widget.iconColor,
                           size: 42,
                         ),
                     );
@@ -185,7 +189,7 @@ class _VoiceWidgetState extends State<VoiceWidget> {
                         onTap: widget.pageManager.pause,
                         child: Icon(
                           Icons.pause_rounded,
-                          color: white,
+                          color: widget.iconColor,
                           size: 42,
                         ));
                 }
@@ -207,14 +211,14 @@ class _VoiceWidgetState extends State<VoiceWidget> {
                   buffered: value.buffered,
                   total: value.total,
                   onSeek: widget.pageManager.seek,
-                  baseBarColor: white,
+                  baseBarColor: widget.progressbarColor,
                   barHeight: 4,
-                  thumbColor: orangeColor,
-                  progressBarColor: orangeColor,
-                  bufferedBarColor: orangeColor,
+                  thumbColor: widget.progressbarSecondColor,
+                  progressBarColor: widget.progressbarSecondColor,
+                  bufferedBarColor: widget.progressbarSecondColor,
                   timeLabelType: TimeLabelType.totalTime,
                   timeLabelTextStyle:
-                  TextStyle(color: white, fontFamily: "Questv", fontSize: 10),
+                  TextStyle(color: widget.fontColor, fontFamily: "Questv", fontSize: 10),
                   timeLabelPadding: 2,
                 ),
               );
@@ -227,10 +231,11 @@ class _VoiceWidgetState extends State<VoiceWidget> {
 }
 
 class VoiceConstWidget extends StatefulWidget {
-  VoiceConstWidget({Key? key, required this.ff, required this.totalDuration})
+  VoiceConstWidget({Key? key, required this.ff, required this.totalDuration, required this.progressbarColor, required this.progressbarSecondColor, required this.iconColor, required this.fontColor})
       : super(key: key);
   VoidCallback ff;
   String totalDuration;
+  final Color progressbarColor, progressbarSecondColor, iconColor, fontColor;
 
   @override
   State<VoiceConstWidget> createState() => _VoiceConstWidgetState();
@@ -247,11 +252,10 @@ class _VoiceConstWidgetState extends State<VoiceConstWidget> {
             children: [
               InkWell(
                 onTap: widget.ff,
-
                 child: Icon(
                   Icons.play_arrow_rounded,
                   size: 42.0,
-                  color: white,
+                  color: widget.iconColor,
                 ),
               ),
               const SizedBox(height: 7,)
@@ -267,14 +271,14 @@ class _VoiceConstWidgetState extends State<VoiceConstWidget> {
               buffered: const Duration(seconds: 0),
               total: stringToDuration(widget.totalDuration),
               onSeek: (_) {},
-              baseBarColor: white,
+              baseBarColor: widget.progressbarColor,
               barHeight: 4,
-              thumbColor: orangeColor,
-              progressBarColor: orangeColor,
-              bufferedBarColor: orangeColor,
+              thumbColor: widget.progressbarSecondColor,
+              progressBarColor: widget.progressbarSecondColor,
+              bufferedBarColor: widget.progressbarSecondColor,
               timeLabelType: TimeLabelType.totalTime,
               timeLabelTextStyle:
-              TextStyle(color: white, fontFamily: "Questv", fontSize: 10),
+              TextStyle(color: widget.fontColor, fontFamily: "Questv", fontSize: 10),
               timeLabelPadding: 2,
             ),
           ),

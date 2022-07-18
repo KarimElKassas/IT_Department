@@ -15,6 +15,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:it_department/modules/GroupChat/details/screens/group_details_screen.dart';
 import 'package:just_audio/just_audio.dart' as j;
 import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -207,8 +208,14 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
     dY = 0;
     emit(GroupConversationEndRecord());
   }
-  void navigateToDetails(BuildContext context,String groupID, String groupName, String groupImage, List<Object?> membersList, List<Object?> adminsList){
-    //navigateTo(context, GroupDetailsScreen(groupID: groupID,groupName: groupName,groupImage: groupImage, membersList: membersList, adminsList: adminsList, membersCount: ((membersList.length + adminsList.length) - 1).toString(),));
+  void navigateToDetails(BuildContext context,String groupID, String groupName, String groupImage, List<Object?> membersList, List<Object?> adminsList, List<GroupChatModel> chatList){
+    Navigator.push(
+        context,
+        ScaleTransition1(
+            page: GroupDetailsScreen(groupID: groupID, groupName: groupName , groupImage: groupImage, membersList: membersList, adminsList: adminsList, chatList: chatList,),
+            startDuration: const Duration(milliseconds: 1000),
+            closeDuration: const Duration(milliseconds: 400),
+            type: ScaleTrasitionTypes.center));
   }
 
   void getUserData(String groupName, String groupID) async {
@@ -319,7 +326,7 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
     chatListMap['ChatLastMessage'] = message;
     chatListMap['ChatLastMessageType'] = type;
     chatListMap['ChatLastMessageTime'] = currentTime;
-    chatListMap['ChatLastMessageSenderID'] = userID;
+    chatListMap['ChatLastMessageSenderID'] = userID;chatListMap['ChatLastMessageSenderName'] = userName;
     chatListMap["TimeStamp"] = Timestamp.now();
 
 
@@ -418,7 +425,7 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
     chatListMap['ChatLastMessage'] = file.files.first.name;
     chatListMap['ChatLastMessageType'] = "file";
     chatListMap['ChatLastMessageTime'] = currentTime;
-    chatListMap['ChatLastMessageSenderID'] = userID;
+    chatListMap['ChatLastMessageSenderID'] = userID;chatListMap['ChatLastMessageSenderName'] = userName;
     chatListMap["TimeStamp"] = Timestamp.now();
 
     if(file.files.first.size > 1000000){
@@ -526,7 +533,7 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
               chatListMap['ChatLastMessage'] = message;
               chatListMap['ChatLastMessageType'] = messageType;
               chatListMap['ChatLastMessageTime'] = currentTime;
-              chatListMap['ChatLastMessageSenderID'] = userID;
+              chatListMap['ChatLastMessageSenderID'] = userID;chatListMap['ChatLastMessageSenderName'] = userName;
               chatListMap["TimeStamp"] = Timestamp.now();
 
               FirebaseFirestore.instance
@@ -607,6 +614,7 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
     chatListMap['ChatLastMessageType'] = "audio";
     chatListMap['ChatLastMessageTime'] = currentTime;
     chatListMap['ChatLastMessageSenderID'] = userID;
+    chatListMap['ChatLastMessageSenderName'] = userName;
     chatListMap["TimeStamp"] = Timestamp.now();
 
     ref.doc(currentFullTime).set(dataMap).then((value) async {

@@ -11,30 +11,62 @@ import 'package:sizer/sizer.dart';
 
 import '../../../../shared/constants.dart';
 import '../../../../shared/gallery_item_wrapper_view.dart';
+import '../../../Chat/widget/intial.dart';
+import '../../../Chat/widget/page_manager.dart';
 import '../cubit/group_media_details_cubit.dart';
 
-class GroupMediaDetailsScreen extends StatelessWidget {
-  const GroupMediaDetailsScreen({Key? key, required this.initialIndex, required this.groupName, required this.groupID, required this.imagesList, required this.filesList, required this.recordsList}) : super(key: key);
+class GroupMediaDetailsScreen extends StatefulWidget {
+  const GroupMediaDetailsScreen(
+      {Key? key,
+      required this.initialIndex,
+      required this.groupName,
+      required this.groupID,
+      required this.imagesList,
+      required this.filesList,
+      required this.recordsList})
+      : super(key: key);
   final int initialIndex;
   final String groupName;
   final String groupID;
   final List<String> imagesList;
   final List<GroupChatModel> filesList;
   final List<GroupChatModel> recordsList;
+
+  @override
+  State<GroupMediaDetailsScreen> createState() =>
+      _GroupMediaDetailsScreenState();
+}
+
+class _GroupMediaDetailsScreenState extends State<GroupMediaDetailsScreen> {
+  late final PageManager _pageManager;
+
+  @override
+  void initState() {
+    _pageManager = PageManager();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pageManager.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => GroupMediaDetailsCubit(),
       child: BlocConsumer<GroupMediaDetailsCubit, GroupMediaDetailsStates>(
-        listener: (context, state){},
-        builder: (context, state){
-
+        listener: (context, state) {},
+        builder: (context, state) {
           var cubit = GroupMediaDetailsCubit.get(context);
 
           return Directionality(
             textDirection: TextDirection.rtl,
             child: DefaultTabController(
-              initialIndex: initialIndex,
+              initialIndex: widget.initialIndex,
               length: 3,
               child: Container(
                 height: 100.h,
@@ -46,7 +78,7 @@ class GroupMediaDetailsScreen extends StatelessWidget {
                       statusBarIconBrightness: Brightness.dark,
                       // For Android (dark icons)
                       statusBarBrightness:
-                      Brightness.light, // For iOS (dark icons)
+                          Brightness.light, // For iOS (dark icons)
                     ),
                     elevation: 0.0,
                     automaticallyImplyLeading: false,
@@ -55,10 +87,19 @@ class GroupMediaDetailsScreen extends StatelessWidget {
                       textDirection: TextDirection.rtl,
                       child: Row(
                         children: [
-                          InkWell(onTap: (){Navigator.pop(context);}, child: const Icon(Icons.arrow_back_rounded, color: Colors.black,)),
-                          const SizedBox(width: 12,),
+                          InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Icon(
+                                Icons.arrow_back_rounded,
+                                color: Colors.black,
+                              )),
+                          const SizedBox(
+                            width: 12,
+                          ),
                           AutoSizeText(
-                            "وسائط جروب  $groupName",
+                            "وسائط جروب  ${widget.groupName}",
                             style: const TextStyle(
                               color: Colors.black,
                               fontFamily: "Questv",
@@ -75,68 +116,90 @@ class GroupMediaDetailsScreen extends StatelessWidget {
                       indicatorWeight: 0.8,
                       tabs: [
                         Tab(
-                          child: AutoSizeText('الصور',
-                            style: TextStyle(color: Colors.black, fontFamily: "Questv"), minFontSize: 8, maxLines: 1, maxFontSize: 10,),
+                          child: AutoSizeText(
+                            'الصور',
+                            style: TextStyle(
+                                color: Colors.black, fontFamily: "Questv"),
+                            minFontSize: 8,
+                            maxLines: 1,
+                            maxFontSize: 10,
+                          ),
                         ),
                         Tab(
-                          child: AutoSizeText('الملفات', style: TextStyle(color: Colors.black, fontFamily: "Questv"),minFontSize: 8, maxLines: 1, maxFontSize: 10,),
+                          child: AutoSizeText(
+                            'الملفات',
+                            style: TextStyle(
+                                color: Colors.black, fontFamily: "Questv"),
+                            minFontSize: 8,
+                            maxLines: 1,
+                            maxFontSize: 10,
+                          ),
                         ),
                         Tab(
-                          child: AutoSizeText('التسجيلات الصوتية', style: TextStyle(color: Colors.black, fontFamily: "Questv"),minFontSize: 8, maxLines: 1, maxFontSize: 10,),
+                          child: AutoSizeText(
+                            'التسجيلات الصوتية',
+                            style: TextStyle(
+                                color: Colors.black, fontFamily: "Questv"),
+                            minFontSize: 8,
+                            maxLines: 1,
+                            maxFontSize: 10,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   body: Container(
                     color: veryLightGreen.withOpacity(0.1),
-                    child: TabBarView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(),
-                            child: GridView.builder(
-                              itemCount: imagesList.length,
-                              semanticChildCount: 0,
-                              gridDelegate:
+                    child: TabBarView(children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(),
+                        child: GridView.builder(
+                          itemCount: widget.imagesList.length,
+                          semanticChildCount: 0,
+                          gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                mainAxisSpacing: 0,
-                                crossAxisSpacing: 0,
-                              ),
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) => imagesGridItem(context, index),
-                            ),
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 0,
+                            crossAxisSpacing: 0,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                            child: ListView.separated(
-                              shrinkWrap: true,
-                              physics: const BouncingScrollPhysics(),
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, listIndex) =>
-                                  filesListItem(context, cubit, listIndex),
-                              separatorBuilder: (context, index) => const Divider(
-                                thickness: 0.4,
-                                color: Colors.grey,
-                              ),
-                              itemCount: filesList.length,
-                            ),
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) =>
+                              imagesGridItem(context, index),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 12),
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, listIndex) =>
+                              filesListItem(context, cubit, listIndex),
+                          separatorBuilder: (context, index) => const Divider(
+                            thickness: 0.4,
+                            color: Colors.grey,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                            child: ListView.separated(
-                              shrinkWrap: true,
-                              physics: const BouncingScrollPhysics(),
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, listIndex) =>
-                                  filesListItem(context, cubit, listIndex),
-                              separatorBuilder: (context, index) => const Divider(
-                                thickness: 0.4,
-                                color: Colors.grey,
-                              ),
-                              itemCount: filesList.length,
-                            ),
-                          )
-                        ]),
+                          itemCount: widget.filesList.length,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 12),
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, listIndex) =>
+                              audiosListItem(context, cubit, listIndex),
+                          separatorBuilder: (context, index) => const Divider(
+                            thickness: 0.4,
+                            color: Colors.grey,
+                          ),
+                          itemCount: widget.recordsList.length,
+                        ),
+                      )
+                    ]),
                   ),
                 ),
               ),
@@ -146,117 +209,133 @@ class GroupMediaDetailsScreen extends StatelessWidget {
       ),
     );
   }
-  Widget imagesGridItem(BuildContext context, int index){
+
+  Widget imagesGridItem(BuildContext context, int index) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         openImageFullScreen(context, index);
       },
       child: Container(
-        margin:
-        const EdgeInsets.all(1),
-        decoration:
-        BoxDecoration(
-            borderRadius:
-            const BorderRadius.all(
-              Radius.circular(
-                  0.0),
+        margin: const EdgeInsets.all(1),
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(0.0),
             ),
-            color: lightGreen
-        ),
+            color: lightGreen),
         padding: const EdgeInsets.all(0.5),
         width: 100,
         //height: 50,
         child: CachedNetworkImage(
-          imageUrl: imagesList[index].toString(),
-          imageBuilder: (context,
-              imageProvider) =>
-              ClipRRect(
-                borderRadius:
-                BorderRadius.circular(
-                    0.0),
-                child: FadeInImage(
+          imageUrl: widget.imagesList[index].toString(),
+          imageBuilder: (context, imageProvider) => ClipRRect(
+            borderRadius: BorderRadius.circular(0.0),
+            child: FadeInImage(
+              fit: BoxFit.cover,
+              image: imageProvider,
+              placeholder: const AssetImage("assets/images/placeholder.jpg"),
+              imageErrorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  'assets/images/error.png',
                   fit: BoxFit.cover,
-                  image: imageProvider,
-                  placeholder:
-                  const AssetImage(
-                      "assets/images/placeholder.jpg"),
-                  imageErrorBuilder:
-                      (context, error,
-                      stackTrace) {
-                    return Image.asset(
-                      'assets/images/error.png',
-                      fit: BoxFit.cover,
-                    );
-                  },
-                ),
-              ),
-          placeholder: (context,
-              url) =>
-          const Center(
-              child:
-              CircularProgressIndicator(
-                color: Colors.teal,
-                strokeWidth: 0.8,
-              )),
-          errorWidget:
-              (context, url, error) =>
-          const FadeInImage(
+                );
+              },
+            ),
+          ),
+          placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(
+            color: Colors.teal,
+            strokeWidth: 0.8,
+          )),
+          errorWidget: (context, url, error) => const FadeInImage(
             fit: BoxFit.cover,
-            image: AssetImage(
-                "assets/images/error.png"),
-            placeholder: AssetImage(
-                "assets/images/placeholder.jpg"),
+            image: AssetImage("assets/images/error.png"),
+            placeholder: AssetImage("assets/images/placeholder.jpg"),
           ),
         ),
       ),
     );
   }
-  Widget filesListItem(BuildContext context, GroupMediaDetailsCubit cubit, int index){
+
+  Widget voiceNote(String urls, String totalDuration, Color progressBarColor,
+      Color progressBarSecondColor, Color iconColor, Color fontColor) {
+    return BuildCondition(
+      condition: urlint == urls,
+      builder: (ctx) {
+        return VoiceWidget(
+          pageManager: _pageManager,
+          progressbarColor: progressBarColor,
+          progressbarSecondColor: progressBarSecondColor,
+          iconColor: iconColor,
+          fontColor: fontColor,
+        );
+      },
+      fallback: (ctx) {
+        return VoiceConstWidget(
+          ff: () {
+            setState(() {
+              _pageManager.stop();
+              _pageManager.dispose();
+              _pageManager.url = urls;
+              _pageManager.audioPlayer.setUrl(urls);
+              _pageManager.init();
+              urlint = urls;
+            });
+            _pageManager.progressNotifier.value = ProgressBarState(
+              current: Duration.zero,
+              buffered: Duration.zero,
+              total: Duration.zero,
+            );
+          },
+          totalDuration: totalDuration,
+          progressbarColor: progressBarColor,
+          progressbarSecondColor: progressBarSecondColor,
+          iconColor: iconColor,
+          fontColor: fontColor,
+        );
+      },
+    );
+  }
+
+  Widget filesListItem(
+      BuildContext context, GroupMediaDetailsCubit cubit, int index) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         if (cubit.checkForDocumentFile(
-            filesList[index].fileName,
-            groupName)) {
+            widget.filesList[index].fileName, widget.groupName)) {
           OpenFile.open(
-              "/storage/emulated/0/Download/IT Department/$groupName/Documents/${filesList[index].fileName}");
+              "/storage/emulated/0/Download/IT Department/${widget.groupName}/Documents/${widget.filesList[index].fileName}");
         } else {
           cubit
-              .downloadDocumentFile(
-              filesList[index]
-                  .fileName,
-              groupName,
-              groupID)
+              .downloadDocumentFile(widget.filesList[index].fileName,
+                  widget.groupName, widget.groupID)
               .then((value) {
             OpenFile.open(
-                "/storage/emulated/0/Download/IT Department/$groupName/Documents/${filesList[index].fileName}");
+                "/storage/emulated/0/Download/IT Department/${widget.groupName}/Documents/${widget.filesList[index].fileName}");
           });
         }
-
       },
       child: Container(
-        margin:
-        const EdgeInsets.all(2),
-        decoration:
-        const BoxDecoration(
-            borderRadius:
-            BorderRadius.all(
-              Radius.circular(
-                  0.0),
-            ),
+        margin: const EdgeInsets.all(2),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(0.0),
+          ),
         ),
         width: 100.w,
         //height: 50,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(width: 8,),
+            const SizedBox(
+              width: 8,
+            ),
             Expanded(
               flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText(
-                    "${filesList[index].senderName}  •••  ${filesList[index].messageTime}",
+                    "${widget.filesList[index].senderName}  •••  ${widget.filesList[index].messageTime}",
                     style: TextStyle(
                         color: orangeColor,
                         fontFamily: "Questv",
@@ -265,9 +344,11 @@ class GroupMediaDetailsScreen extends StatelessWidget {
                     maxLines: 2,
                     maxFontSize: 10,
                   ),
-                  const SizedBox(height: 4,),
+                  const SizedBox(
+                    height: 4,
+                  ),
                   AutoSizeText(
-                    filesList[index].fileName,
+                    widget.filesList[index].fileName,
                     style: const TextStyle(
                         color: Colors.black,
                         fontFamily: "Questv",
@@ -283,15 +364,74 @@ class GroupMediaDetailsScreen extends StatelessWidget {
             Container(
               margin: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: lightGreen
-              ),
+                  borderRadius: BorderRadius.circular(8), color: lightGreen),
               height: 50,
               width: 20.w,
-              child: const Icon(Icons.file_copy, color: Colors.white,),
+              child: const Icon(
+                Icons.file_copy,
+                color: Colors.white,
+              ),
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget audiosListItem(
+      BuildContext context, GroupMediaDetailsCubit cubit, int index) {
+    return Container(
+      margin: const EdgeInsets.all(2),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(0.0),
+        ),
+      ),
+      width: 100.w,
+      //height: 50,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AutoSizeText(
+            "${widget.recordsList[index].senderName}  •••  ${widget.recordsList[index].messageTime}",
+            style: TextStyle(
+                color: orangeColor,
+                fontFamily: "Questv",
+                fontWeight: FontWeight.w600),
+            minFontSize: 8,
+            maxLines: 2,
+            maxFontSize: 10,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: lightGreen),
+                height: 50,
+                width: 20.w,
+                child: const Icon(
+                  Icons.audiotrack_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              Expanded(
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: voiceNote(
+                      widget.recordsList[index].message,
+                      widget.recordsList[index].recordDuration,
+                      lightGreen,
+                      orangeColor,
+                      lightGreen,
+                      lightGreen),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -302,7 +442,7 @@ class GroupMediaDetailsScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => GalleryImageWrapper(
           titleGallery: "",
-          galleryItems: imagesList,
+          galleryItems: widget.imagesList,
           backgroundDecoration: BoxDecoration(
               color: Colors.black, borderRadius: BorderRadius.circular(4)),
           initialIndex: index,

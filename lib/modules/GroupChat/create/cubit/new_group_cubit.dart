@@ -123,7 +123,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
   }
 
   void navigateToGroupConversation(BuildContext context, String groupID,
-      String groupName, String groupImage) async {
+      String groupName, String groupImage, String createdBy) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<Object?> adminsList = [];
@@ -135,6 +135,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
           groupID: groupID,
           groupName: groupName,
           groupImage: groupImage,
+          createdBy: createdBy,
           adminsList: adminsList,
           membersList: selectedClerksIDList,
           openedFrom: "Create",
@@ -320,6 +321,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
     dataMap['ChatType'] = "Group";
     dataMap['ChatName'] = groupName;
     dataMap['ChatID'] = currentFullTime;
+    dataMap['createdBy'] = clerkNumber;
     dataMap['DateCreated'] = currentFullTime;
     dataMap['TimeStamp'] = Timestamp.now();
     dataMap['Admins'] = groupAdminsList;
@@ -348,7 +350,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
               .update(dataMap)
               .then((realtimeDbValue) async {
             navigateToGroupConversation(
-                context, currentFullTime, groupName, value.toString());
+                context, currentFullTime, groupName, value.toString(), clerkNumber);
             createGroupList(context, groupName, value.toString(),
                 (selectedClerksIDList.length + 1).toString(), currentFullTime);
             /*clerkSubscriptionsList = [];

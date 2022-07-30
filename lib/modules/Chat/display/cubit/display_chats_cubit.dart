@@ -64,55 +64,18 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
             page: route,
             startDuration: const Duration(milliseconds: 1500),
             closeDuration: const Duration(milliseconds: 800),
-            type: ScaleTrasitionTypes.bottomRight));
+            type: ScaleTrasitionTypes.center));
   }
-
+  
   Future<void> getChats() async {
     emit(DisplayChatsLoadingChatsState());
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    FirebaseFirestore.instance
-        .collection("Chats")
-        .where("ChatType", isEqualTo: "Group")
-        .where("MembersAndAdmins", arrayContains: prefs.getString("ClerkID").toString())
-        .orderBy("TimeStamp", descending: true)
-        .snapshots()
-        .listen((event) async {
-      groupList.clear();
-      filteredGroupList.clear();
-      for (var element in event.docs) {
-        if (element.exists) {
-          Map data = element.data();
-          print("MEMBERS COUNT IS -> ${data["MembersCount"]}\n");
-          print("Group INFOOOOOOO ::: $data\n");
-          displayGroupModel = DisplayGroupsModel(
-              data["ChatID"],
-              data["ChatName"],
-              data["ChatImageUrl"],
-              data["MembersCount"],
-              data["ChatLastMessage"],
-              data["ChatLastMessageTime"],
-              data["ChatLastMessageType"],
-              data["ChatLastMessageSenderID"],
-              data["ChatLastMessageSenderName"],
-              data["ChatUnReadCount"],
-              data["ChatPartnerState"],
-              data["Members"],
-              data["Admins"],
-              data["MembersAndAdmins"],
-          );
-          groupList.add(displayGroupModel!);
-          filteredGroupList = groupList.toList();
-        }
-      }
-      print("FILTERED GROUP LIST LENGTH : ${filteredGroupList.length}\n");
-      emit(DisplayChatsGetChatsState());
-    });
 
     FirebaseFirestore.instance
+        .collection("ChatList")
+        .doc(prefs.getString("ClerkID").toString())
         .collection("Chats")
-        .where("ChatType", isEqualTo: "Single")
-        .where("Members", arrayContains: prefs.getString("ClerkID").toString())
         .orderBy("TimeStamp", descending: true)
         .snapshots()
         .listen((event) async {
@@ -123,25 +86,23 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
       for (var element in event.docs) {
         if (element.exists) {
           Map data = element.data();
-          print("DATA ::: $data\n");
+          //print("DATA ::: $data\n");
           displayChatModel = DisplayChatModel(
-              data["ReceiverID"].toString(),
-              data["ReceiverName"].toString(),
-              data["ReceiverImage"].toString(),
-              data["ReceiverToken"].toString(),
-              data["ChatID"].toString(),
-              data["LastMessage"].toString(),
-              data["LastMessageTime"].toString(),
-              data["LastMessageType"].toString(),
-              data["LastMessageSenderID"].toString(),
-              data["LastMessageSenderName"].toString(),
-              data["UnReadMessagesCount"].toString(),
-              data["PartnerState"].toString(),
-              data["Members"],
+            data["ReceiverID"].toString(),
+            data["ReceiverName"].toString(),
+            data["ReceiverImage"].toString(),
+            data["ReceiverToken"].toString(),
+            data["ChatID"].toString(),
+            data["LastMessage"].toString(),
+            data["LastMessageTime"].toString(),
+            data["LastMessageType"].toString(),
+            data["LastMessageSender"].toString(),
+            data["UnReadMessagesCount"].toString(),
+            data["PartnerState"].toString(),
           );
           await FirebaseFirestore.instance
               .collection("Clerks")
-              .doc(data["ReceiverID"])
+              .doc(data["ReceiverID"].toString())
               .get()
               .then((value) {
             if (value.exists) {
@@ -174,6 +135,47 @@ class DisplayChatsCubit extends Cubit<DisplayChatsStates> {
       print("User List Length : ${clerkList.length}\n");
       emit(DisplayChatsGetChatsState());
     });
+
+    FirebaseFirestore.instance
+        .collection("Chats")
+        .where("ChatType", isEqualTo: "Group")
+        .where("MembersAndAdmins", arrayContains: prefs.getString("ClerkID").toString())
+        .orderBy("TimeStamp", descending: true)
+        .snapshots()
+        .listen((event) async {
+      groupList.clear();
+      filteredGroupList.clear();
+      for (var element in event.docs) {
+        if (element.exists) {
+          Map data = element.data();
+          print("MEMBERS COUNT IS -> ${data["MembersCount"]}\n");
+          print("Group INFOOOOOOO ::: $data\n");
+          displayGroupModel = DisplayGroupsModel(
+              data["ChatID"],
+              data["ChatName"],
+              data["ChatImageUrl"],
+              data["createdBy"],
+              data["MembersCount"],
+              data["ChatLastMessage"],
+              data["ChatLastMessageTime"],
+              data["ChatLastMessageType"],
+              data["ChatLastMessageSenderID"],
+              data["ChatLastMessageSenderName"],
+              data["ChatUnReadCount"],
+              data["ChatPartnerState"],
+              data["Members"],
+              data["Admins"],
+              data["MembersAndAdmins"],
+          );
+          groupList.add(displayGroupModel!);
+          filteredGroupList = groupList.toList();
+        }
+      }
+      print("FILTERED GROUP LIST LENGTH : ${filteredGroupList.length}\n");
+      emit(DisplayChatsGetChatsState());
+    });
+
+
   }
 
   void startSearch(BuildContext context) {

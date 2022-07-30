@@ -208,11 +208,11 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
     dY = 0;
     emit(GroupConversationEndRecord());
   }
-  void navigateToDetails(BuildContext context,String groupID, String groupName, String groupImage, List<Object?> membersList, List<Object?> adminsList, List<GroupChatModel> chatList){
+  void navigateToDetails(BuildContext context,String groupID,  String groupName, String groupImage, String createdBy, List<Object?> membersList, List<Object?> adminsList, List<GroupChatModel> chatList){
     Navigator.push(
         context,
         ScaleTransition1(
-            page: GroupDetailsScreen(groupID: groupID, groupName: groupName , groupImage: groupImage, membersList: membersList, adminsList: adminsList, chatList: chatList,),
+            page: GroupDetailsScreen(groupID: groupID, groupName: groupName , groupImage: groupImage, createdBy: createdBy, membersList: membersList, adminsList: adminsList, chatList: chatList,),
             startDuration: const Duration(milliseconds: 1000),
             closeDuration: const Duration(milliseconds: 400),
             type: ScaleTrasitionTypes.center));

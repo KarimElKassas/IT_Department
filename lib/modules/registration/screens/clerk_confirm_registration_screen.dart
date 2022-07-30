@@ -62,7 +62,7 @@ class _ClerkConfirmRegistrationScreenState
             showDialog(
                 context: context,
                 builder: (BuildContext context) =>
-                    const BlurryProgressDialog(title: "جارى انشاء الحساب"));
+                    BlurryProgressDialog(title: "جارى انشاء الحساب"));
           }
         },
         builder: (context, state) {

@@ -8,4 +8,14 @@ class GroupMediaDetailsLoadingDownloadFileState extends GroupMediaDetailsStates{
 
 class GroupMediaDetailsDownloadFileSuccessState extends GroupMediaDetailsStates{}
 
+class GroupMediaDetailsChangeRecordPositionState extends GroupMediaDetailsStates{}
+
+class GroupMediaDetailsPlayRecordSuccessState extends GroupMediaDetailsStates{}
+
+class GroupMediaDetailsDownloadFileErrorState extends GroupMediaDetailsStates{
+  final String error;
+
+  GroupMediaDetailsDownloadFileErrorState(this.error);
+}
+
 class GroupMediaDetailsDownloadFilePermissionDeniedState extends GroupMediaDetailsStates{}

@@ -6,17 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:it_department/modules/Chat/conversation/screens/conversation_screen.dart';
 import 'package:it_department/modules/GroupChat/conversation/screens/group_conversation_screen.dart';
 import 'package:it_department/modules/Home/screens/home_screen.dart';
+import 'package:it_department/modules/Settings/Home/screens/settings_home_screen.dart';
 import 'package:it_department/shared/components.dart';
 import 'package:it_department/shared/constants.dart';
+import 'package:it_department/shared/fingerprint/screens/fingerprint_screen.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../GroupChat/create/screens/select_group_users_screen.dart';
 import '../cubit/display_chats_cubit.dart';
 import '../cubit/display_chats_states.dart';
+import 'new_chat_screen.dart';
 
 class DisplayChatsScreen extends StatelessWidget {
   DisplayChatsScreen({Key? key, required this.initialIndex}) : super(key: key);
@@ -79,6 +81,16 @@ class DisplayChatsScreen extends StatelessWidget {
                                   color: Colors.black,
                                 ),
                               ),
+                              const SizedBox(width: 8,),
+                              GestureDetector(
+                                onTap: (){
+                                  navigateTo(context, const FingerPrintScreen(openedFrom: "Display",));
+                                },
+                                child: const Icon(
+                                  IconlyBroken.setting,
+                                  color: Colors.black,
+                                ),
+                              )
                             ],
                           ),
                         ) : Builder(
@@ -107,11 +119,7 @@ class DisplayChatsScreen extends StatelessWidget {
                           builder: (context) {
                             return FloatingActionButton(
                               onPressed: () {
-                                  if(DefaultTabController.of(context)!.index == 0){
-                                    showToast(message: "جاية ف السكة يا حمادة ...", length: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 3);
-                                  }else{
-                                    cubit.navigate(context, const SelectGroupUsersScreen());
-                                  }
+                                cubit.navigate(context, DefaultTabController.of(context)!.index == 0 ? const NewChatScreen() : const SelectGroupUsersScreen());
                               },
                               child: const Icon(
                                 Icons.chat_rounded,
@@ -554,6 +562,7 @@ class DisplayChatsScreen extends StatelessWidget {
                   groupID: cubit.filteredGroupList[index].groupID,
                   groupName: cubit.filteredGroupList[index].groupName,
                   groupImage: cubit.filteredGroupList[index].groupImage,
+                  createdBy: cubit.filteredGroupList[index].createdBy,
                   adminsList: cubit.filteredGroupList[index].adminsList,
                   membersList: cubit.filteredGroupList[index].membersList,
                   openedFrom: "Display",

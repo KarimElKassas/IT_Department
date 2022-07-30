@@ -30,6 +30,7 @@ class GroupConversationScreen extends StatefulWidget {
   final String groupID;
   final String groupName;
   final String groupImage;
+  final String createdBy;
   final List<Object?> adminsList;
   final List<Object?> membersList;
   final String openedFrom;
@@ -39,6 +40,7 @@ class GroupConversationScreen extends StatefulWidget {
       required this.groupID,
       required this.groupName,
       required this.groupImage,
+      required this.createdBy,
       required this.adminsList,
       required this.membersList,
       required this.openedFrom})
@@ -192,6 +194,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                     widget.groupID,
                                     widget.groupName,
                                     widget.groupImage,
+                                    widget.createdBy,
                                     widget.membersList,
                                     widget.adminsList,
                                     cubit.chatListReversed);
@@ -567,15 +570,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: InkWell(
             onTap: () {
-              Navigator.push(
-                  context,
-                  ScaleTransition1(
-                      page: ChatOpenedImageScreen(
-                        imageUrl: cubit.chatListReversed[index].fileName,
-                      ),
-                      startDuration: const Duration(milliseconds: 1000),
-                      closeDuration: const Duration(milliseconds: 600),
-                      type: ScaleTrasitionTypes.center));
+              openImageFullScreen(context, [cubit.chatListReversed[index].fileName], 0);
             },
             child: Container(
               width: 60.w,
@@ -686,7 +681,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                     ),
                                   ),
                                   Positioned(
-                                    bottom: 5,
+                                    bottom: 2,
                                     right: 5,
                                     child: Text(
                                       cubit.chatListReversed[index].messageTime,
@@ -887,8 +882,10 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                                         .messageImagesList[
                                                     imageIndex]!,
                                                 onTap: () {
-                                                  openImageFullScreen(
-                                                      index, imageIndex, cubit);
+                                                  openImageFullScreen(context, cubit
+                                                      .chatListReversed[index]
+                                                      .chatImagesModel!
+                                                      .messageImagesList, imageIndex);
                                                 },
                                               );
                                       }),
@@ -1040,8 +1037,10 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                                 .chatImagesModel!
                                                 .messageImagesList[imageIndex]!,
                                             onTap: () {
-                                              openImageFullScreen(
-                                                  index, imageIndex, cubit);
+                                              openImageFullScreen(context, cubit
+                                                  .chatListReversed[index]
+                                                  .chatImagesModel!
+                                                  .messageImagesList, imageIndex);
                                             },
                                           );
                                   }),
@@ -1105,19 +1104,17 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
       ],
     );
   }
-
-  void openImageFullScreen(final int indexOfMessage, int indexOfImage,
-      GroupConversationCubit cubit) {
+  void openImageFullScreen(
+      BuildContext context, List<dynamic> imagesList, final int index) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GalleryImageWrapper(
           titleGallery: "",
-          galleryItems: cubit.chatListReversed[indexOfMessage].chatImagesModel!
-              .messageImagesList,
+          galleryItems: imagesList,
           backgroundDecoration: BoxDecoration(
               color: Colors.black, borderRadius: BorderRadius.circular(4)),
-          initialIndex: indexOfImage,
+          initialIndex: index,
           scrollDirection: Axis.horizontal,
         ),
       ),

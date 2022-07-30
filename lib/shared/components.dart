@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:ui' as ui;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:it_department/shared/constants.dart';
 import 'package:transition_plus/transition_plus.dart';
 
 void navigateTo(context, widget) =>
@@ -17,10 +19,12 @@ void finish(BuildContext context, route) {
       context,
       ScaleTransition1(
           page: route,
-          startDuration: const Duration(milliseconds: 1500),
-          closeDuration: const Duration(milliseconds: 800),
+          startDuration: const Duration(milliseconds: 1000),
+          closeDuration: const Duration(milliseconds: 400),
           type: ScaleTrasitionTypes.center));
 }
+
+
 
 Widget defaultButton({
   double width = double.infinity,
@@ -75,9 +79,24 @@ class BlurryDialog extends StatelessWidget {
 
   String title;
   String content;
+  TextStyle? titleTextStyle;
+  TextStyle? contentTextStyle;
+  TextStyle? okTextStyle;
+  TextStyle? noTextStyle;
+  double? titleTextMinSize;
+  double? titleTextMaxSize;
+  double? contentTextMinSize;
+  double? contentTextMaxSize;
+  int? contentTextMaxLines;
+  double? okTextMinSize;
+  double? okTextMaxSize;
+  double? noTextMinSize;
+  double? noTextMaxSize;
+  double? blurValue;
   VoidCallback continueCallBack;
+  VoidCallback cancelCallBack;
 
-  BlurryDialog(this.title, this.content, this.continueCallBack);
+  BlurryDialog(this.title, this.content, this.continueCallBack, this.cancelCallBack, {this.titleTextStyle, this.contentTextStyle, this.okTextStyle, this.noTextStyle, this.blurValue, this.titleTextMinSize, this.titleTextMaxSize, this.contentTextMinSize, this.contentTextMaxSize, this.contentTextMaxLines, this.okTextMinSize, this.okTextMaxSize, this.noTextMinSize, this.noTextMaxSize});
   TextStyle textStyle = const TextStyle (color: Colors.teal, fontSize: 12);
 
   @override
@@ -85,22 +104,21 @@ class BlurryDialog extends StatelessWidget {
     return Directionality(
       textDirection: ui.TextDirection.rtl,
       child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          filter: ui.ImageFilter.blur(sigmaX: blurValue??4, sigmaY: blurValue??4),
           child:  AlertDialog(
-            title: Text(title,style: textStyle,),
-            content: Text(content, style: textStyle,),
+            title: AutoSizeText(title,style: titleTextStyle??textStyle, minFontSize: titleTextMinSize??10, maxLines: 1, maxFontSize: titleTextMaxSize??14,),
+            content: AutoSizeText(content, style: contentTextStyle??textStyle, minFontSize: contentTextMinSize??8, maxLines: contentTextMaxLines??2, maxFontSize: contentTextMaxSize??12,),
             actions: <Widget>[
               TextButton(
-                child: Text("نعم", style: textStyle,),
+                child: AutoSizeText("نعم", style: okTextStyle??textStyle, minFontSize: okTextMinSize??10, maxLines: 1, maxFontSize: okTextMaxSize??12,),
                 onPressed: () {
                   continueCallBack();
-                  Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text("الغاء", style: textStyle,),
+                child: AutoSizeText("الغاء", style: noTextStyle??textStyle,minFontSize: noTextMinSize??10, maxLines: 1, maxFontSize: noTextMaxSize??12,),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  cancelCallBack();
                 },
               ),
             ],
@@ -111,23 +129,24 @@ class BlurryDialog extends StatelessWidget {
 
 class BlurryProgressDialog extends StatelessWidget {
   final String title;
-
-  const BlurryProgressDialog({Key? key, required this.title}) : super(key: key);
+  TextStyle? titleStyle;
+  double? titleMinSize, titleMaxSize, blurValue;
+  int? titleMaxLines;
+  BlurryProgressDialog({Key? key, required this.title, this.titleStyle, this.titleMaxLines, this.titleMaxSize, this.titleMinSize, this.blurValue}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: ui.TextDirection.rtl,
       child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          filter: ui.ImageFilter.blur(sigmaX: blurValue??4, sigmaY: blurValue??4),
           child: AlertDialog(
             scrollable: true,
             content: Column(
               children: [
-                Text(title, style: TextStyle(color: Colors.teal[700], fontSize: 12),),
+                CircularProgressIndicator(color: lightGreen, strokeWidth: 0.8,),
                 const SizedBox(height: 36,),
-                CircularProgressIndicator(color: Colors.teal[700], strokeWidth: 0.8,),
+                AutoSizeText(title, style: titleStyle ?? TextStyle(color: Colors.teal[700], fontSize: 12), minFontSize: titleMinSize??12, maxFontSize: titleMaxSize??14, maxLines: titleMaxLines??2,),
                 const SizedBox(height: 8,),
-
               ],
             ),
           )),

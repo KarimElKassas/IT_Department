@@ -242,7 +242,8 @@ class ConversationCubit extends Cubit<ConversationStates> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
 
-    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
+    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
+    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
 
     messageControllerValue.value = "";
     messageController.clear();
@@ -282,6 +283,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
         .set(dataMap)
         .then((value) async {
       chatListRef.update(chatListMap);
+      chatListTwoRef.update(chatListMap);
       sendNotification(message, currentTime, userToken);
       emit(ConversationSendMessageState());
     });
@@ -295,12 +297,13 @@ class ConversationCubit extends Cubit<ConversationStates> {
     String currentTime = DateFormat("hh:mm a").format(now);
     String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
 
-    var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child("Documents");
-    var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages");
-    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userID = prefs.getString("ClerkID")!;
+
+    var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child("Documents");
+    var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages");
+    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
+    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
 
     Map<String, dynamic> dataMap = HashMap();
     dataMap['SenderID'] = prefs.getString('ClerkID');
@@ -331,7 +334,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
     chatListMap['LastMessage'] = file.files.last;
     chatListMap['LastMessageType'] = "file";
     chatListMap['LastMessageTime'] = currentTime;
-    chatListMap['LastMessageSender'] = prefs.getString('ClerkID');
+    chatListMap['LastMessageSender'] = userID;
     chatListMap["TimeStamp"] = Timestamp.now();
 
       ref.doc(currentFullTime).set(dataMap).then((value) async {
@@ -348,6 +351,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
             ref.doc(currentFullTime).update(dataMap).then((value){
               chatListRef.update(chatListMap);
+              chatListTwoRef.update(chatListMap);
               uploadingFileName = "";
               emit(ConversationSendFilesSuccessState());
             }).catchError((error){
@@ -383,7 +387,8 @@ class ConversationCubit extends Cubit<ConversationStates> {
 
     var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child(currentFullTime);
     var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages").doc(currentFullTime);
-    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
+    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
+    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
 
     List<String> urlsList = [];
 
@@ -437,6 +442,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
               chatListMap["TimeStamp"] = Timestamp.now();
 
               chatListRef.update(chatListMap);
+              chatListTwoRef.update(chatListMap);
               emit(ConversationSendImagesSuccessState());
             }).catchError((error){
               print("UPLOAD ERROR : $error\n");
@@ -597,13 +603,14 @@ class ConversationCubit extends Cubit<ConversationStates> {
     DateTime now = DateTime.now();
     String currentTime = DateFormat("hh:mm a").format(now);
     String currentFullTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(now);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userID = prefs.getString("ClerkID")!;
 
     var storageRef = FirebaseStorage.instance.ref("Chats").child(chatID).child("Records").child(audioPathStore);
     var ref = FirebaseFirestore.instance.collection("Chats").doc(chatID).collection("Messages");
-    var chatListRef = FirebaseFirestore.instance.collection("Chats").doc(chatID);
+    var chatListRef = FirebaseFirestore.instance.collection("ChatList").doc(userID).collection("Chats").doc(receiverID);
+    var chatListTwoRef = FirebaseFirestore.instance.collection("ChatList").doc(receiverID).collection("Chats").doc(userID);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    userID = prefs.getString("ClerkID")!;
 
     File audioFile = File(file.path.toString());
     final String minutes = _formatNumber(recordDuration ~/ 60);
@@ -653,6 +660,7 @@ class ConversationCubit extends Cubit<ConversationStates> {
           ref.doc(currentFullTime).update(dataMap).then((value)async {
             uploadingRecordName = "";
             chatListRef.update(chatListMap);
+            chatListTwoRef.update(chatListMap);
             emit(ConversationSendFilesSuccessState());
           }).catchError((error){
             print("UPLOAD ERROR : $error\n");

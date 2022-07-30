@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/svg.dart';
@@ -97,7 +98,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
           var cubit = ConversationCubit.get(context);
           return WillPopScope(
             onWillPop: (){
-              if(widget.openedFrom == "Display"){
+              if(widget.openedFrom == "Display" || widget.openedFrom == "GroupDetails"){
+                Navigator.pop(context);
+              }else if(widget.openedFrom == "CreateNew"){
+                Navigator.pop(context);
                 Navigator.pop(context);
               }else{
                 finish(context, DisplayChatsScreen(initialIndex: 0));
@@ -124,8 +128,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         children: <Widget>[
                           IconButton(
                             onPressed: () {
-                              if(widget.openedFrom == "Display"){
-                                  Navigator.pop(context);
+                              if(widget.openedFrom == "Display" || widget.openedFrom == "GroupDetails"){
+                                Navigator.pop(context);
+                              }else if(widget.openedFrom == "CreateNew"){
+                                Navigator.pop(context);
+                                Navigator.pop(context);
                               }else{
                                 finish(context, DisplayChatsScreen(initialIndex: 0));
                               }
@@ -490,54 +497,49 @@ class _ConversationScreenState extends State<ConversationScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: InkWell(
             onTap: () {
-              Navigator.push(
-                  context,
-                  ScaleTransition1(
-                      page: ChatOpenedImageScreen(
-                        imageUrl: cubit.chatListReversed[index].fileName,
-                      ),
-                      startDuration: const Duration(milliseconds: 1000),
-                      closeDuration: const Duration(milliseconds: 600),
-                      type: ScaleTrasitionTypes.bottomRight));
+                  openImageFullScreen(context, [cubit.chatListReversed[index].fileName], 0);
             },
             child: Container(
               width: 60.w,
-              height: 30.h,
+              constraints: BoxConstraints(maxHeight: 36.h, minHeight: 30.h),
               decoration: BoxDecoration(
                   borderRadius:
-                      cubit.chatListReversed[index].senderID == cubit.userID
-                          ? const BorderRadius.only(
-                              topLeft: Radius.circular(14.0),
-                              bottomLeft: Radius.circular(14.0),
-                              bottomRight: Radius.circular(14.0),
-                            )
-                          : const BorderRadius.only(
-                              topRight: Radius.circular(14.0),
-                              bottomLeft: Radius.circular(14.0),
-                              bottomRight: Radius.circular(14.0),
-                            ),
+                  cubit.chatListReversed[index].senderID == cubit.userID
+                      ? const BorderRadius.only(
+                    topLeft: Radius.circular(14.0),
+                    bottomLeft: Radius.circular(14.0),
+                    bottomRight: Radius.circular(14.0),
+                  )
+                      : const BorderRadius.only(
+                    topRight: Radius.circular(14.0),
+                    bottomLeft: Radius.circular(14.0),
+                    bottomRight: Radius.circular(14.0),
+                  ),
                   color: (cubit.chatListReversed[index].senderID == cubit.userID
                       ? lightGreen.withOpacity(0.75)
                       : white)),
               child: Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: cubit.chatListReversed[index].chatImagesModel!
-                              .messageImagesList.length !=
-                          cubit.chatListReversed[index].imagesCount
+                      .messageImagesList.length !=
+                      cubit.chatListReversed[index].imagesCount
                       ? SizedBox(
-                          height: 30.h,
-                          child: Center(
-                              child: CircularProgressIndicator(
-                            color: lightGreen,
-                            strokeWidth: 0.8,
-                          )),
-                        )
+                    height: 30.h,
+                    child: Center(
+                        child: CircularProgressIndicator(
+                          color: lightGreen,
+                          strokeWidth: 0.8,
+                        )),
+                  )
                       : Column(
-                          crossAxisAlignment:
-                              cubit.chatListReversed[index].senderID !=
-                                      cubit.userID
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                    cubit.chatListReversed[index].senderID !=
+                        cubit.userID
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Stack(
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(14),
@@ -549,45 +551,47 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                     bottomRight: Radius.circular(14.0)),
                                 child: CachedNetworkImage(
                                   width: double.infinity,
-                                  height: 29.h,
-                                  imageUrl: cubit.chatListReversed[index]
-                                      .chatImagesModel!.messageImagesList[0]
+                                  fit: BoxFit.cover,
+                                  imageUrl: cubit
+                                      .chatListReversed[index]
+                                      .chatImagesModel!
+                                      .messageImagesList[0]
                                       .toString(),
-                                  imageBuilder: (context, imageProvider) =>
-                                      ClipRRect(
-                                    borderRadius: BorderRadius.circular(14.0),
-                                    child: FadeInImage(
-                                      fit: BoxFit.cover,
-                                      image: imageProvider,
-                                      placeholder: const AssetImage(
-                                          "assets/images/placeholder.jpg"),
-                                      imageErrorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Image.asset(
-                                          'assets/images/error.png',
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
-                                    ),
-                                  ),
                                   placeholder: (context, url) => Center(
                                       child: CircularProgressIndicator(
-                                    color: lightGreen,
-                                    strokeWidth: 0.8,
-                                  )),
+                                        color: cubit.chatListReversed[index].senderID !=
+                                            cubit.userID ? lightGreen : Colors.white,
+                                        strokeWidth: 0.8,
+                                      )),
                                   errorWidget: (context, url, error) =>
-                                      const FadeInImage(
-                                    fit: BoxFit.cover,
-                                    image:
-                                        AssetImage("assets/images/error.png"),
-                                    placeholder: AssetImage(
-                                        "assets/images/placeholder.jpg"),
-                                  ),
+                                      Center(
+                                          child: CircularProgressIndicator(
+                                            color: cubit.chatListReversed[index].senderID !=
+                                                cubit.userID ? lightGreen : Colors.white,
+                                            strokeWidth: 0.8,
+                                          )),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 2,
+                              right: 5,
+                              child: Text(
+                                cubit.chatListReversed[index].messageTime,
+                                style: TextStyle(
+                                  fontFamily: "Questv",
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: white,
                                 ),
                               ),
                             ),
                           ],
-                        )),
+                          alignment: Alignment.bottomRight,
+                        ),
+                      ),
+                    ],
+                  )),
             ),
           ),
         ),
@@ -736,8 +740,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                     .chatImagesModel!
                                     .messageImagesList[imageIndex]!,
                                 onTap: () {
-                                  openImageFullScreen(
-                                      index, imageIndex, cubit);
+                                  openImageFullScreen(context, cubit
+                                      .chatListReversed[index]
+                                      .chatImagesModel!
+                                      .messageImagesList, imageIndex);
                                 },
                               );
                             }) ,
@@ -789,82 +795,106 @@ class _ConversationScreenState extends State<ConversationScreen> {
         cubit.chatListReversed[index].chatImagesModel != null) {
       if (cubit.chatListReversed[index].imagesCount > 1) {
         return Align(
-              alignment: cubit.chatListReversed[index].senderID == cubit.userID
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.65,
-                  // 45% of total width
-                  //height: 300,
-                  alignment: Alignment.topLeft,
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        cubit.chatListReversed[index].senderID == cubit.userID
-                            ? const BorderRadius.only(
-                                topLeft: Radius.circular(14.0),
-                                bottomLeft: Radius.circular(14.0),
-                                bottomRight: Radius.circular(14.0),
-                              )
-                            : const BorderRadius.only(
-                                topRight: Radius.circular(14.0),
-                                bottomLeft: Radius.circular(14.0),
-                                bottomRight: Radius.circular(14.0),
-                              ),
-                    color:
-                        (cubit.chatListReversed[index].senderID == cubit.userID
-                            ? lightGreen.withOpacity(0.75)
-                            : white),
-                  ),
-                  child: cubit.chatListReversed[index].chatImagesModel!
-                      .messageImagesList.length ==
-                      cubit.chatListReversed[index].imagesCount
-                      ? GridView.builder(
-                      primary: false,
-                      itemCount:
-                      cubit.chatListReversed[index].imagesCount > 4
-                          ? 4
-                          : cubit.chatListReversed[index].imagesCount,
-                      padding: const EdgeInsets.all(6),
-                      semanticChildCount: 1,
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 5,
-                        crossAxisSpacing: 3,
-                      ),
-                      shrinkWrap: true,
-                      itemBuilder:
-                          (BuildContext context, int imageIndex) {
-                        return cubit.chatListReversed[index].imagesCount >
-                            4 &&
-                            imageIndex == 3
-                            ? buildImageNumbers(index, imageIndex, cubit)
-                            : GalleryThumbnail(
-                          galleryItem: cubit
-                              .chatListReversed[index]
-                              .chatImagesModel!
-                              .messageImagesList[imageIndex]!,
-                          onTap: () {
-                            openImageFullScreen(
-                                index, imageIndex, cubit);
-                          },
-                        );
-                      })
-                      : SizedBox(
-                    height: 10.h,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: white,
-                        strokeWidth: 0.8,
-                      ),
-                    ),
+          alignment: cubit.chatListReversed[index].senderID == cubit.userID
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Container(
+                width: 60.w,
+                //height: 300,
+                alignment: Alignment.topLeft,
+                decoration: BoxDecoration(
+                  borderRadius:
+                  cubit.chatListReversed[index].senderID == cubit.userID
+                      ? const BorderRadius.only(
+                    topLeft: Radius.circular(14.0),
+                    bottomLeft: Radius.circular(14.0),
+                    bottomRight: Radius.circular(14.0),
                   )
-
+                      : const BorderRadius.only(
+                    topRight: Radius.circular(14.0),
+                    bottomLeft: Radius.circular(14.0),
+                    bottomRight: Radius.circular(14.0),
+                  ),
+                  color: (cubit.chatListReversed[index].senderID == cubit.userID
+                      ? lightGreen.withOpacity(0.75)
+                      : white),
                 ),
-              ),
-            );
+                child: cubit.chatListReversed[index].chatImagesModel!
+                    .messageImagesList.length ==
+                    cubit.chatListReversed[index].imagesCount
+                    ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Stack(
+                      children: [
+                        GridView.builder(
+                            primary: false,
+                            itemCount: cubit.chatListReversed[index]
+                                .imagesCount >
+                                4
+                                ? 4
+                                : cubit
+                                .chatListReversed[index].imagesCount,
+                            semanticChildCount: 1,
+                            padding: const EdgeInsets.all(6),
+                            gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 2,
+                              crossAxisSpacing: 2,
+                            ),
+                            shrinkWrap: true,
+                            itemBuilder:
+                                (BuildContext context, int imageIndex) {
+                              return cubit.chatListReversed[index]
+                                  .imagesCount >
+                                  4 &&
+                                  imageIndex == 3
+                                  ? buildImageNumbers(
+                                  index, imageIndex, cubit)
+                                  : GalleryThumbnail(
+                                galleryItem: cubit
+                                    .chatListReversed[index]
+                                    .chatImagesModel!
+                                    .messageImagesList[imageIndex]!,
+                                onTap: () {
+                                    openImageFullScreen(context, cubit
+                                        .chatListReversed[index]
+                                        .chatImagesModel!
+                                        .messageImagesList, imageIndex);
+                                },
+                              );
+                            }),
+                        Positioned(
+                          bottom: 5,
+                          right: 8,
+                          child: Text(
+                            cubit.chatListReversed[index].messageTime,
+                            style: TextStyle(
+                              fontFamily: "Questv",
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+                    : SizedBox(
+                  height: 30.h,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: white,
+                      strokeWidth: 0.8,
+                    ),
+                  ),
+                )),
+          ),
+        );
       } else {
         return imageMessageView(context, cubit, index, state);
       }
@@ -896,17 +926,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   void openImageFullScreen(
-      final int indexOfMessage, int indexOfImage, ConversationCubit cubit) {
+      BuildContext context, List<dynamic> imagesList, final int index) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GalleryImageWrapper(
           titleGallery: "",
-          galleryItems: cubit.chatListReversed[indexOfMessage].chatImagesModel!
-              .messageImagesList,
+          galleryItems: imagesList,
           backgroundDecoration: BoxDecoration(
               color: Colors.black, borderRadius: BorderRadius.circular(4)),
-          initialIndex: indexOfImage,
+          initialIndex: index,
           scrollDirection: Axis.horizontal,
         ),
       ),

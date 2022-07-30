@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:it_department/modules/Chat/display/cubit/display_chats_cubit.dart';
 import 'package:it_department/modules/Login/clerk_login_screen.dart';
 import 'package:it_department/modules/SplashScreen/splash_screen.dart';
+import 'package:it_department/modules/onBoarding/screens/on_boarding_screen.dart';
 import 'package:it_department/shared/bloc_observer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart' as res;
 
 import 'network/local/cache_helper.dart';

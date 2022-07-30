@@ -82,7 +82,7 @@ dependencies:
   just_audio: ^0.9.15
   audio_video_progress_bar: ^0.9.0
   cupertino_icons: ^1.0.2
-
+  flutter_local_auth_invisible: ^2.2.0
 flutter_icons:
   android: "launcher_icon"
   ios: true

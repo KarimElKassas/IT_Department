@@ -4,13 +4,17 @@ import 'package:external_path/external_path.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:it_department/modules/Chat/display/screens/display_chats_screen.dart';
 import 'package:it_department/modules/Home/screens/home_screen.dart';
 import 'package:it_department/modules/SplashScreen/cubit/splash_states.dart';
+import 'package:it_department/modules/onBoarding/screens/on_boarding_screen.dart';
+import 'package:it_department/shared/fingerprint/screens/fingerprint_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transition_plus/transition_plus.dart';
 
 import '../../../../network/remote/dio_helper.dart';
+import '../../../shared/components.dart';
 import '../../Login/clerk_login_screen.dart';
 
 class SplashCubit extends Cubit<SplashStates> {
@@ -24,10 +28,26 @@ class SplashCubit extends Cubit<SplashStates> {
     await Future.delayed(const Duration(milliseconds: 4000), () {});
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(!prefs.containsKey("FirstTime") || prefs.getBool("FirstTime") == true){
+      finish(context, OnBoardingScreen());
 
-    if(prefs.getString("ClerkID") != null){
-      await getDepartmentManager(prefs.getString("ClerkManagementID")!.toString());
-      finish(context, (managerID != prefs.getString("ClerkNumber")!.toString()) ? const HomeScreen() : const HomeScreen());
+    }else if(prefs.getString("ClerkID") != null){
+
+      if(prefs.containsKey("FingerTime")){
+
+        int currentTimeInMillis = DateTime.now().millisecondsSinceEpoch;
+        int lastFingerTime = prefs.getInt("FingerTime")!;
+        print("DIFFERENCE : ${currentTimeInMillis - lastFingerTime}\n");
+        if(currentTimeInMillis - lastFingerTime > 60000){
+          print("DIFFERENCE IN : ${currentTimeInMillis - lastFingerTime}\n");
+          finish(context, const FingerPrintScreen(openedFrom: "Splash",));
+        }else{
+          finish(context, DisplayChatsScreen(initialIndex: 0));
+        }
+      }else{
+        await getDepartmentManager(prefs.getString("ClerkManagementID")!.toString());
+        finish(context, (managerID != prefs.getString("ClerkNumber")!.toString()) ? const HomeScreen() : const HomeScreen());
+      }
     }else{
       finish(context, ClerkLoginScreen());
     }
@@ -93,9 +113,5 @@ class SplashCubit extends Cubit<SplashStates> {
     } else {
       emit(SplashSuccessPermissionDeniedState());
     }
-  }
-
-  void finish(BuildContext context, route){
-    Navigator.pushReplacement(context, ScaleTransition1(page: route, startDuration: const Duration(milliseconds: 1500),closeDuration: const Duration(milliseconds: 800), type: ScaleTrasitionTypes.bottomRight));
   }
 }

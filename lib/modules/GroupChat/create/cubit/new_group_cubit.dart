@@ -333,7 +333,7 @@ class NewGroupCubit extends Cubit<NewGroupStates> {
     dataMap['ChatImageUrl'] = "";
     dataMap['ChatUnReadCount'] = "";
     dataMap['ChatPartnerState'] = "";
-    dataMap['MembersCount'] = (groupAdminsList + selectedClerksIDList).toString();
+    dataMap['MembersCount'] = (groupAdminsList.length + selectedClerksIDList.length).toString();
     dataMap['MembersAndAdmins'] = (groupAdminsList + selectedClerksIDList).toList();
 
     groupRef.doc(currentFullTime).set(dataMap).then((value) async {

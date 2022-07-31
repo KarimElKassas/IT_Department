@@ -130,9 +130,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             onPressed: () {
                               if(widget.openedFrom == "Display" || widget.openedFrom == "GroupDetails"){
                                 Navigator.pop(context);
-                              }else if(widget.openedFrom == "CreateNew"){
-                                Navigator.pop(context);
-                                Navigator.pop(context);
                               }else{
                                 finish(context, DisplayChatsScreen(initialIndex: 0));
                               }

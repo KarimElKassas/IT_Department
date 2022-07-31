@@ -154,70 +154,6 @@ class BlurryProgressDialog extends StatelessWidget {
   }
 }
 
-class PulsatingCircleIconButton extends StatefulWidget {
-  const PulsatingCircleIconButton({
-    Key? key,
-    required this.onLongPressStart,
-    required this.onLongPressUp,
-    required this.icon,
-  }) : super(key: key);
-
-  final Function onLongPressStart;
-  final Function onLongPressUp;
-  final Icon icon;
-
-  @override
-  _PulsatingCircleIconButtonState createState() => _PulsatingCircleIconButtonState();
-}
-
-class _PulsatingCircleIconButtonState extends State<PulsatingCircleIconButton> with SingleTickerProviderStateMixin {
-  AnimationController? _animationController;
-  Animation? _animation;
-
-  @override
-  void initState() {
-    _animationController = AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    _animation = Tween(begin: 0.0, end: 12.0).animate(
-      CurvedAnimation(parent: _animationController!, curve: Curves.easeOut),
-    );
-    _animationController!.repeat(reverse: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPressStart : widget.onLongPressStart(),
-      onLongPressUp : widget.onLongPressUp(),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: AnimatedBuilder(
-          animation: _animation!,
-          builder: (context, _) {
-            return Ink(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  for (int i = 1; i <= 2; i++)
-                    BoxShadow(
-                      color: Colors.white.withOpacity(_animationController!.value / 2),
-                      spreadRadius: _animation!.value * i,
-                    )
-                ],
-              ),
-              child: widget.icon,
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
 class DateUtil{
 
   static String formatDate(DateTime date){
@@ -235,3 +171,4 @@ class DateUtil{
 Widget getEmptyWidget() {
   return const SizedBox.shrink();
 }
+

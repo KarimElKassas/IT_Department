@@ -25,7 +25,7 @@ class SplashCubit extends Cubit<SplashStates> {
   String? managerID;
 
   Future<void> navigate(BuildContext context) async {
-    await Future.delayed(const Duration(milliseconds: 4000), () {});
+    await Future.delayed(const Duration(milliseconds: 2000), () {});
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(!prefs.containsKey("FirstTime") || prefs.getBool("FirstTime") == true){

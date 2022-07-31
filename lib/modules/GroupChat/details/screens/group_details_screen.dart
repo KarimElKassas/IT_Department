@@ -259,7 +259,6 @@ class GroupDetailsScreen extends StatelessWidget {
                               top: 16, right: 16, left: 16),
                           child: SingleChildScrollView(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 cubit.mediaCount != 0
                                     ? Column(
@@ -377,201 +376,202 @@ class GroupDetailsScreen extends StatelessWidget {
                                   ),
                                   itemCount: cubit.filteredClerkList.length,
                                 ),
-                                const SizedBox(
-                                  height: 64,
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.only(
-                                          topRight: Radius.circular(24),
-                                          topLeft: Radius.circular(24)),
-                                      color: veryLightGreen.withOpacity(0.1)),
-                                  padding: const EdgeInsets.only(
-                                      top: 8, bottom: 24, right: 8, left: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: InkWell(
-                                            onTap: () {
-                                              showDialog(
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder: (BuildContext
-                                                          mContext) =>
-                                                      WillPopScope(
-                                                        onWillPop: () => Future.value(false),
-                                                        child: BlurryDialog(
-                                                          "تنبيه !",
-                                                          "هل تريد الخروج من المجموعة ؟",
-                                                          () {
-                                                            cubit.changeDeleteDialogResult(true);
-                                                            Navigator.of(mContext).pop();
-                                                          },
-                                                            (){
+                                Align(
+                                  alignment: FractionalOffset.bottomCenter,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.only(
+                                            topRight: Radius.circular(24),
+                                            topLeft: Radius.circular(24)),
+                                        color: veryLightGreen.withOpacity(0.1)),
+                                    margin: const EdgeInsets.only(top: 64),
+                                    padding: const EdgeInsets.only(
+                                        top: 8, bottom: 24, right: 8, left: 8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4),
+                                            child: InkWell(
+                                              onTap: () {
+                                                showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder: (BuildContext
+                                                    mContext) =>
+                                                        WillPopScope(
+                                                          onWillPop: () => Future.value(false),
+                                                          child: BlurryDialog(
+                                                            "تنبيه !",
+                                                            "هل تريد الخروج من المجموعة ؟",
+                                                                () {
+                                                              cubit.changeDeleteDialogResult(true);
+                                                              Navigator.of(mContext).pop();
+                                                            },
+                                                                (){
                                                               cubit.changeDeleteDialogResult(false);
                                                               Navigator.of(mContext).pop();
                                                             },
-                                                          titleTextStyle:
-                                                              TextStyle(
-                                                                  fontFamily:
-                                                                      "Questv",
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  color:
-                                                                      lightGreen),
-                                                          contentTextStyle:
-                                                              TextStyle(
-                                                                  fontFamily:
-                                                                      "Questv",
-                                                                  color:
-                                                                      lightGreen),
-                                                          okTextStyle: TextStyle(
-                                                              fontFamily:
-                                                                  "Questv",
-                                                              fontWeight:
-                                                                  FontWeight.w600,
-                                                              color: lightGreen),
-                                                          noTextStyle: TextStyle(
-                                                              fontFamily:
-                                                                  "Questv",
-                                                              fontWeight:
-                                                                  FontWeight.w600,
-                                                              color: lightGreen),
-                                                          blurValue: 0.5,
-                                                          contentTextMaxLines: 2,
-                                                          contentTextMinSize: 10,
-                                                          contentTextMaxSize: 12,
-                                                          titleTextMaxSize: 14,
-                                                          titleTextMinSize: 12,
-                                                          noTextMaxSize: 12,
-                                                          noTextMinSize: 10,
-                                                          okTextMaxSize: 12,
-                                                          okTextMinSize: 10,
-                                                        ),
-                                                      )).then((value){
-                                                        if(cubit.deleteDialogResult){
-                                                          cubit.leaveGroup(groupID, context);
-                                                        }
-                                              });
-                                            },
-                                            child: Container(
-                                              //width: 36,
-                                              height: 36,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(48),
-                                                color: white,
+                                                            titleTextStyle:
+                                                            TextStyle(
+                                                                fontFamily:
+                                                                "Questv",
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w600,
+                                                                color:
+                                                                lightGreen),
+                                                            contentTextStyle:
+                                                            TextStyle(
+                                                                fontFamily:
+                                                                "Questv",
+                                                                color:
+                                                                lightGreen),
+                                                            okTextStyle: TextStyle(
+                                                                fontFamily:
+                                                                "Questv",
+                                                                fontWeight:
+                                                                FontWeight.w600,
+                                                                color: lightGreen),
+                                                            noTextStyle: TextStyle(
+                                                                fontFamily:
+                                                                "Questv",
+                                                                fontWeight:
+                                                                FontWeight.w600,
+                                                                color: lightGreen),
+                                                            blurValue: 0.5,
+                                                            contentTextMaxLines: 2,
+                                                            contentTextMinSize: 10,
+                                                            contentTextMaxSize: 12,
+                                                            titleTextMaxSize: 14,
+                                                            titleTextMinSize: 12,
+                                                            noTextMaxSize: 12,
+                                                            noTextMinSize: 10,
+                                                            okTextMaxSize: 12,
+                                                            okTextMinSize: 10,
+                                                          ),
+                                                        )).then((value){
+                                                  if(cubit.deleteDialogResult){
+                                                    cubit.leaveGroup(groupID, context);
+                                                  }
+                                                });
+                                              },
+                                              child: Container(
+                                                //width: 36,
+                                                height: 36,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                  BorderRadius.circular(48),
+                                                  color: white,
+                                                ),
+                                                child: Icon(
+                                                  Icons.exit_to_app_rounded,
+                                                  color: lightGreen,
+                                                  size: 22,
+                                                ),
                                               ),
-                                              child: Icon(
-                                                Icons.exit_to_app_rounded,
-                                                color: lightGreen,
-                                                size: 22,
+                                            ),
+                                          ),
+                                        ), //Leave Group
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4),
+                                            child: InkWell(
+                                              onTap: () {},
+                                              child: Container(
+                                                //width: 36,
+                                                height: 36,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                  BorderRadius.circular(48),
+                                                  color: white,
+                                                ),
+                                                child: Icon(
+                                                  Icons.not_interested,
+                                                  color: lightGreen,
+                                                  size: 22,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ), //Leave Group
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: InkWell(
-                                            onTap: () {},
-                                            child: Container(
-                                              //width: 36,
-                                              height: 36,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(48),
-                                                color: white,
-                                              ),
-                                              child: Icon(
-                                                Icons.not_interested,
-                                                color: lightGreen,
-                                                size: 22,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: InkWell(
-                                            onTap: () {},
-                                            child: Container(
-                                              //width: 36,
-                                              height: 36,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(48),
-                                                color: white,
-                                              ),
-                                              child: Icon(
-                                                Icons.lock_rounded,
-                                                color: lightGreen,
-                                                size: 22,
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4),
+                                            child: InkWell(
+                                              onTap: () {},
+                                              child: Container(
+                                                //width: 36,
+                                                height: 36,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                  BorderRadius.circular(48),
+                                                  color: white,
+                                                ),
+                                                child: Icon(
+                                                  Icons.lock_rounded,
+                                                  color: lightGreen,
+                                                  size: 22,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: InkWell(
-                                            onTap: () {},
-                                            child: Container(
-                                              //width: 36,
-                                              height: 36,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(48),
-                                                color: white,
-                                              ),
-                                              child: Icon(
-                                                Icons.audiotrack_rounded,
-                                                color: lightGreen,
-                                                size: 22,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: InkWell(
-                                            onTap: () {},
-                                            child: Container(
-                                              //width: 36,
-                                              height: 36,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(48),
-                                                color: white,
-                                              ),
-                                              child: Icon(
-                                                Icons.notifications_rounded,
-                                                color: lightGreen,
-                                                size: 22,
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4),
+                                            child: InkWell(
+                                              onTap: () {},
+                                              child: Container(
+                                                //width: 36,
+                                                height: 36,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                  BorderRadius.circular(48),
+                                                  color: white,
+                                                ),
+                                                child: Icon(
+                                                  Icons.audiotrack_rounded,
+                                                  color: lightGreen,
+                                                  size: 22,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4),
+                                            child: InkWell(
+                                              onTap: () {},
+                                              child: Container(
+                                                //width: 36,
+                                                height: 36,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                  BorderRadius.circular(48),
+                                                  color: white,
+                                                ),
+                                                child: Icon(
+                                                  Icons.notifications_rounded,
+                                                  color: lightGreen,
+                                                  size: 22,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ),

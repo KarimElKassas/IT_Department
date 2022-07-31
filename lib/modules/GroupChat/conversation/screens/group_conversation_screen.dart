@@ -1431,214 +1431,247 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
     print("USER IDDDDD ${cubit.userID}\n");
     if (cubit.chatListReversed[index].type == "audio") {
       return Padding(
-        padding: const EdgeInsets.only(top: 4, bottom: 4),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              margin: cubit.chatListReversed[index].senderID == cubit.userID
-                  ? EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width / 8,
-                      top: 5.0,
-                    )
-                  : EdgeInsets.only(
-                      right: MediaQuery.of(context).size.width / 8,
-                      top: 5.0,
-                    ),
-              alignment: cubit.chatListReversed[index].senderID == cubit.userID
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: Container(
-                margin: EdgeInsets.zero,
-                width: 75.w,
-                decoration: BoxDecoration(
-                  color: cubit.chatListReversed[index].senderID == cubit.userID
-                      ? lightGreen.withOpacity(0.75)
-                      : white,
-                  borderRadius:
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Container(
+          width: 100.w,
+          margin: cubit.chatListReversed[index].senderID == cubit.userID
+              ? const EdgeInsets.only(
+                  top: 5.0,
+                )
+              : const EdgeInsets.only(
+                  top: 5.0,
+                ),
+          alignment: cubit.chatListReversed[index].senderID == cubit.userID
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: Stack(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(width: cubit.padding ,),
+                  Container(
+                    margin: EdgeInsets.zero,
+                    width: 75.w,
+                    decoration: BoxDecoration(
+                      color: cubit.chatListReversed[index].senderID == cubit.userID
+                          ? lightGreen.withOpacity(0.75)
+                          : white,
+                      borderRadius:
                       cubit.chatListReversed[index].senderID == cubit.userID
                           ? const BorderRadius.only(
-                              topLeft: Radius.circular(14.0),
-                              bottomLeft: Radius.circular(14.0),
-                              bottomRight: Radius.circular(14.0),
-                            )
+                        topLeft: Radius.circular(14.0),
+                        bottomLeft: Radius.circular(14.0),
+                        bottomRight: Radius.circular(14.0),
+                      )
                           : const BorderRadius.only(
-                              topRight: Radius.circular(14.0),
-                              bottomLeft: Radius.circular(14.0),
-                              bottomRight: Radius.circular(14.0),
-                            ),
-                ),
-                child: cubit.chatListReversed[index].senderID == cubit.userID
-                    ? Row(
-                        children: [
+                        topRight: Radius.circular(14.0),
+                        bottomLeft: Radius.circular(14.0),
+                        bottomRight: Radius.circular(14.0),
+                      ),
+                    ),
+                    child: cubit.chatListReversed[index].senderID == cubit.userID
+                        ? GestureDetector(
+                      onHorizontalDragStart: (DragStartDetails details){
+                        cubit.startpoint = details.globalPosition.dx;
+                      },
+                      onHorizontalDragUpdate: (DragUpdateDetails details ){
+                        if(details.globalPosition.dx- cubit.startpoint >= 0 && cubit.drag){
+
+                          if(details.globalPosition.dx- cubit.startpoint >= 200){
+                            cubit.updateDragPaddingAndBoolValues(0, false);
+                          }else{
+                            cubit.updateDragPaddingValue(details.globalPosition.dx- cubit.startpoint);
+                            print("${details.globalPosition.dx- cubit.startpoint}\n");
+                          }
+                        }
+                      },
+                      onHorizontalDragEnd: (DragEndDetails details){
+                        cubit.updateDragPaddingAndBoolValues(0, true);
+                      },
+                          child: Row(
+                      children: [
                           Expanded(
-                            child: voiceNote(
-                                cubit.chatListReversed[index].message,
-                                cubit.chatListReversed[index].recordDuration,
-                                white,
-                                orangeColor,
-                                white,
-                                white),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+
+                                voiceNote(
+                                    cubit.chatListReversed[index].message,
+                                    cubit.chatListReversed[index].recordDuration,
+                                    white,
+                                    orangeColor,
+                                    white,
+                                    white),
+                              ],
+                            ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 4),
-                            child: CircleAvatar(
-                              radius: 23.0,
-                              backgroundColor:
-                                  cubit.chatListReversed[index].senderID ==
-                                          cubit.userID
-                                      ? const Color.fromRGBO(60, 80, 100, 1)
-                                      : const Color.fromRGBO(102, 102, 255, 1),
-                              backgroundImage: const ExactAssetImage(
-                                "assets/images/me.jpg",
-                              ),
-                              child: CachedNetworkImage(
-                                imageUrl:
-                                    cubit.chatListReversed[index].senderImage,
-                                imageBuilder: (context, imageProvider) =>
-                                    ClipOval(
-                                  child: FadeInImage(
+                          GestureDetector(
+
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 4),
+                              child: CircleAvatar(
+                                radius: 23.0,
+                                backgroundColor:
+                                cubit.chatListReversed[index].senderID ==
+                                    cubit.userID
+                                    ? const Color.fromRGBO(60, 80, 100, 1)
+                                    : const Color.fromRGBO(102, 102, 255, 1),
+                                backgroundImage: const ExactAssetImage(
+                                  "assets/images/me.jpg",
+                                ),
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                  cubit.chatListReversed[index].senderImage,
+                                  imageBuilder: (context, imageProvider) =>
+                                      ClipOval(
+                                        child: FadeInImage(
+                                          height: 50,
+                                          width: 50,
+                                          fit: BoxFit.fill,
+                                          image: imageProvider,
+                                          placeholder: const AssetImage(
+                                              "assets/images/placeholder.jpg"),
+                                          imageErrorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'assets/images/error.png',
+                                              fit: BoxFit.fill,
+                                              height: 50,
+                                              width: 50,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                  placeholder: (context, url) => Container(
+                                    width: 50,
+                                    height: 50,
+                                    color: lightGreen,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                  const FadeInImage(
                                     height: 50,
                                     width: 50,
                                     fit: BoxFit.fill,
-                                    image: imageProvider,
-                                    placeholder: const AssetImage(
+                                    image: AssetImage("assets/images/error.png"),
+                                    placeholder: AssetImage(
                                         "assets/images/placeholder.jpg"),
-                                    imageErrorBuilder:
-                                        (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/error.png',
-                                        fit: BoxFit.fill,
-                                        height: 50,
-                                        width: 50,
-                                      );
-                                    },
                                   ),
-                                ),
-                                placeholder: (context, url) => Container(
-                                  width: 50,
-                                  height: 50,
-                                  color: lightGreen,
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const FadeInImage(
-                                  height: 50,
-                                  width: 50,
-                                  fit: BoxFit.fill,
-                                  image: AssetImage("assets/images/error.png"),
-                                  placeholder: AssetImage(
-                                      "assets/images/placeholder.jpg"),
                                 ),
                               ),
                             ),
                           ), // user image
-                        ],
-                      )
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4, right: 10, left: 10),
-                            child: Row(
-                              children: [
-                                Text(
-                                  cubit
-                                      .chatListReversed[index].messageTime,
-                                  style: const TextStyle(
-                                    fontFamily: "Questv",
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  cubit
-                                      .chatListReversed[index].senderName,
-                                  style: const TextStyle(
-                                    fontFamily: "Questv",
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Row(
+                      ],
+                    ),
+                        )
+                        : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4, right: 10, left: 10),
+                          child: Row(
                             children: [
-                              Expanded(
-                                child: voiceNote(
-                                    cubit.chatListReversed[index].message,
-                                    cubit
-                                        .chatListReversed[index].recordDuration,
-                                    lightGreen,
-                                    orangeColor,
-                                    lightGreen,
-                                    lightGreen),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 4.0),
-                                child: CircleAvatar(
-                                  radius: 23.0,
-                                  backgroundColor: cubit.chatListReversed[index]
-                                              .senderID ==
-                                          cubit.userID
-                                      ? const Color.fromRGBO(60, 80, 100, 1)
-                                      : const Color.fromRGBO(102, 102, 255, 1),
-                                  backgroundImage: const ExactAssetImage(
-                                    "assets/images/me.jpg",
-                                  ),
-                                  child: CachedNetworkImage(
-                                    imageUrl: cubit
-                                        .chatListReversed[index].senderImage,
-                                    imageBuilder: (context, imageProvider) =>
-                                        ClipOval(
-                                      child: FadeInImage(
-                                        height: 50,
-                                        width: 50,
-                                        fit: BoxFit.fill,
-                                        image: imageProvider,
-                                        placeholder: const AssetImage(
-                                            "assets/images/placeholder.jpg"),
-                                        imageErrorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Image.asset(
-                                            'assets/images/error.png',
-                                            fit: BoxFit.fill,
-                                            height: 50,
-                                            width: 50,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    placeholder: (context, url) => Container(
-                                      width: 50,
-                                      height: 50,
-                                      color: white,
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        const FadeInImage(
-                                      height: 50,
-                                      width: 50,
-                                      fit: BoxFit.fill,
-                                      image:
-                                          AssetImage("assets/images/error.png"),
-                                      placeholder: AssetImage(
-                                          "assets/images/placeholder.jpg"),
-                                    ),
-                                  ),
+                              Text(
+                                cubit
+                                    .chatListReversed[index].messageTime,
+                                style: const TextStyle(
+                                  fontFamily: "Questv",
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
                                 ),
                               ),
+                              const Spacer(),
+                              Text(
+                                cubit
+                                    .chatListReversed[index].senderName,
+                                style: const TextStyle(
+                                  fontFamily: "Questv",
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              )
                             ],
                           ),
-                        ],
-                      ),
-              ),
-            ),
-          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: voiceNote(
+                                  cubit.chatListReversed[index].message,
+                                  cubit
+                                      .chatListReversed[index].recordDuration,
+                                  lightGreen,
+                                  orangeColor,
+                                  lightGreen,
+                                  lightGreen),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 4.0),
+                              child: CircleAvatar(
+                                radius: 23.0,
+                                backgroundColor: cubit.chatListReversed[index]
+                                    .senderID ==
+                                    cubit.userID
+                                    ? const Color.fromRGBO(60, 80, 100, 1)
+                                    : const Color.fromRGBO(102, 102, 255, 1),
+                                backgroundImage: const ExactAssetImage(
+                                  "assets/images/me.jpg",
+                                ),
+                                child: CachedNetworkImage(
+                                  imageUrl: cubit
+                                      .chatListReversed[index].senderImage,
+                                  imageBuilder: (context, imageProvider) =>
+                                      ClipOval(
+                                        child: FadeInImage(
+                                          height: 50,
+                                          width: 50,
+                                          fit: BoxFit.fill,
+                                          image: imageProvider,
+                                          placeholder: const AssetImage(
+                                              "assets/images/placeholder.jpg"),
+                                          imageErrorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'assets/images/error.png',
+                                              fit: BoxFit.fill,
+                                              height: 50,
+                                              width: 50,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                  placeholder: (context, url) => Container(
+                                    width: 50,
+                                    height: 50,
+                                    color: white,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                  const FadeInImage(
+                                    height: 50,
+                                    width: 50,
+                                    fit: BoxFit.fill,
+                                    image:
+                                    AssetImage("assets/images/error.png"),
+                                    placeholder: AssetImage(
+                                        "assets/images/placeholder.jpg"),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                ],
+              )
+            ],
+          ),
         ),
       );
     } else {

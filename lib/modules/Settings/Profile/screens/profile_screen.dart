@@ -1,121 +1,88 @@
-import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:buildcondition/buildcondition.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:it_department/modules/Settings/Home/cubit/settings_home_cubit.dart';
-import 'package:it_department/modules/Settings/Home/cubit/settings_home_states.dart';
-import 'package:it_department/modules/Settings/Profile/screens/profile_screen.dart';
-import 'package:it_department/shared/constants.dart';
-import 'package:sizer/sizer.dart';
+import 'package:it_department/modules/Settings/Profile/cubit/profile_cubit.dart';
+import 'package:it_department/modules/Settings/Profile/cubit/profile_states.dart';
 
-import '../../../../shared/components.dart';
+import '../../../../shared/constants.dart';
 
-class SettingsHomeScreen extends StatelessWidget {
-  const SettingsHomeScreen({Key? key}) : super(key: key);
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({Key? key, required this.userID, required this.userName, required this.userImage, required this.userPhone, required this.userDepartment, required this.userCategory, required this.userRank, required this.userPassword, required this.userJob}) : super(key: key);
 
-  Widget label(String name,VoidCallback onclick, String? state){
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Container(
-        padding: const EdgeInsets.only(left: 8, right: 12, bottom: 8, top: 8),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        child: InkWell(
-          onTap: (){
-            onclick();
-          },
-          child: Row(
-            children: [
-              Text(name, style: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: "Questv"),),
-              const Spacer(),
-              Row(
-                children: [
-                  Text(state??"", style: const TextStyle(color: Colors.grey, fontSize: 12, fontFamily: "Questv"),),
-                  const SizedBox(width: 4,),
-                  Icon(Icons.arrow_forward_ios_rounded, color: lightGreen, size: 18,)
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    ) ;
-  }
+  final String userID, userName, userImage, userPhone, userDepartment, userCategory, userRank, userPassword, userJob;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SettingsHomeCubit()..getMyData(),
-      child: BlocConsumer<SettingsHomeCubit, SettingsHomeStates>(
+      create: (context) => ProfileCubit(),
+      child: BlocConsumer<ProfileCubit, ProfileStates>(
         listener: (context, state) {},
         builder: (context, state) {
-          var cubit = SettingsHomeCubit.get(context);
+          var cubit = ProfileCubit.get(context);
 
           return Scaffold(
-            appBar: AppBar(
-              systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarColor: Colors.transparent,
-                statusBarIconBrightness: Brightness.dark,
-                // For Android (dark icons)
-                statusBarBrightness: Brightness.light, // For iOS (dark icons)
-              ),
-              elevation: 0,
-              automaticallyImplyLeading: false,
-              backgroundColor: white,
-              flexibleSpace: SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.only(left: 2.0, right: 2.0),
-                  child: Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Transform.scale(
-                            scale: 1,
-                            child: Icon(
-                              Icons.arrow_back_rounded,
+              appBar: AppBar(
+                systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: Brightness.dark,
+                  // For Android (dark icons)
+                  statusBarBrightness: Brightness.light, // For iOS (dark icons)
+                ),
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                backgroundColor: white,
+                flexibleSpace: SafeArea(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Transform.scale(
+                              scale: 1,
+                              child: Icon(
+                                Icons.arrow_back_rounded,
+                                color: lightGreen,
+                                size: 28,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                              child: Center(
+                                child: Text(
+                                  "الملف الشخصى",
+                                  style: TextStyle(
+                                      color: lightGreen,
+                                      letterSpacing: 1.5,
+                                      fontFamily: "Questv",
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16),
+                                ),
+                              ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              //cubit.startSearch(context);
+                            },
+                            icon: Icon(
+                              Icons.menu_open_rounded,
                               color: lightGreen,
                               size: 28,
                             ),
                           ),
-                        ),
-                        Expanded(
-                            child: Center(
-                              child: Text(
-                                "الإعدادات",
-                                style: TextStyle(
-                                    color: lightGreen,
-                                    letterSpacing: 1.5,
-                                    fontFamily: "Questv",
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16),
-                              ),
-                            )),
-                        IconButton(
-                          onPressed: () {
-                            //cubit.startSearch(context);
-                          },
-                          icon: Icon(
-                            Icons.menu_open_rounded,
-                            color: lightGreen,
-                            size: 28,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
             body: Column(
               children: [
                 Container(
@@ -142,7 +109,7 @@ class SettingsHomeScreen extends StatelessWidget {
                             },
                             child: Row(
                               children: [
-                                cubit.myImage == "" ? Stack(
+                                userImage == "" ? Stack(
                                   alignment: Alignment.center,
                                   clipBehavior: Clip.none,
                                   children: [
@@ -150,8 +117,8 @@ class SettingsHomeScreen extends StatelessWidget {
                                       height: 96,
                                       width: 96,
                                       decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(width: 2, color: lightGreen)
+                                          shape: BoxShape.circle,
+                                          border: Border.all(width: 2, color: lightGreen)
                                       ),
                                     ),
                                     Container(
@@ -178,7 +145,7 @@ class SettingsHomeScreen extends StatelessWidget {
                                       height: 96,
                                       width: 96,
                                       child: CachedNetworkImage(
-                                        imageUrl: cubit.myImage,
+                                        imageUrl: userImage,
                                         imageBuilder: (context, imageProvider) => ClipOval(
                                           child: FadeInImage(
                                             height: 96,
@@ -218,7 +185,7 @@ class SettingsHomeScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     AutoSizeText(
-                                      cubit.myName,
+                                      userName,
                                       style: TextStyle(
                                           color: lightGreen,
                                           fontFamily: "Questv",
@@ -229,7 +196,7 @@ class SettingsHomeScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 2,),
                                     AutoSizeText(
-                                      cubit.myPhone,
+                                      userPhone,
                                       style: TextStyle(
                                           color: lightGreen,
                                           fontFamily: "Questv",
@@ -257,29 +224,16 @@ class SettingsHomeScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 40,horizontal: 15),
                       decoration: BoxDecoration(
-                          color: veryLightGreen.withOpacity(0.08),
-                          borderRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(25),
-                            topRight: Radius.circular(25),
-                          ),
+                        color: veryLightGreen.withOpacity(0.08),
+                        borderRadius: const BorderRadius.only(
+                          bottomRight: Radius.circular(25),
+                          topRight: Radius.circular(25),
+                        ),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          label('الحساب الشخصى', () {
-                            print("CLICK\n");
-                            cubit.navigate(context, ProfileScreen(
-                              userID: cubit.myID,
-                              userName: cubit.myName,
-                              userPhone: cubit.myPhone,
-                              userImage: cubit.myImage,
-                              userJob: cubit.myJob,
-                              userRank: cubit.myRank,
-                              userDepartment: cubit.myDepartment,
-                              userCategory: cubit.myCategory,
-                              userPassword: cubit.myPassword,
-                            ));
-                          }, ""),
+                          label('الحساب الشخصى', () {}, ""),
                           label('مظهر التطبيق', () { }, 'فاتح'),
                           label('اللغة', () { }, 'العربية'),
                           label('بصمة الاصبع', () { }, 'مُفعلة'),
@@ -290,7 +244,6 @@ class SettingsHomeScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  height: 50,
                   decoration: BoxDecoration(
                       color: veryLightGreen.withOpacity(0.05)
                   ),
@@ -317,65 +270,7 @@ class SettingsHomeScreen extends StatelessWidget {
                               delay: const Duration(milliseconds: 400),
                               duration: const Duration(milliseconds: 600),
                               child: TextButton(
-                                onPressed: (){
-                                  showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (BuildContext
-                                      mContext) =>
-                                          WillPopScope(
-                                            onWillPop: () => Future.value(false),
-                                            child: BlurryDialog(
-                                              "تنبيه !",
-                                              "هل تريد تسجيل الخروج ؟",
-                                                  () {
-                                                cubit.changeLogOutDialogResult(true);
-                                                cubit.logOut(context);
-                                              },
-                                                  (){
-                                                cubit.changeLogOutDialogResult(false);
-                                                Navigator.of(mContext).pop();
-                                              },
-                                              titleTextStyle:
-                                              TextStyle(
-                                                  fontFamily:
-                                                  "Questv",
-                                                  fontWeight:
-                                                  FontWeight
-                                                      .w600,
-                                                  color:
-                                                  lightGreen),
-                                              contentTextStyle:
-                                              TextStyle(
-                                                  fontFamily:
-                                                  "Questv",
-                                                  color:
-                                                  lightGreen),
-                                              okTextStyle: TextStyle(
-                                                  fontFamily:
-                                                  "Questv",
-                                                  fontWeight:
-                                                  FontWeight.w600,
-                                                  color: lightGreen),
-                                              noTextStyle: TextStyle(
-                                                  fontFamily:
-                                                  "Questv",
-                                                  fontWeight:
-                                                  FontWeight.w600,
-                                                  color: lightGreen),
-                                              blurValue: 0.5,
-                                              contentTextMaxLines: 2,
-                                              contentTextMinSize: 10,
-                                              contentTextMaxSize: 12,
-                                              titleTextMaxSize: 14,
-                                              titleTextMinSize: 12,
-                                              noTextMaxSize: 12,
-                                              noTextMinSize: 10,
-                                              okTextMaxSize: 12,
-                                              okTextMinSize: 10,
-                                            ),
-                                          ));
-                                },
+                                onPressed: (){},
                                 style: ButtonStyle(overlayColor: MaterialStateColor.resolveWith((states) => veryLightGreen.withOpacity(0.08))),
                                 child: Text("تسجيل الخروج", style: TextStyle(color: lightGreen, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Questv"),),),
                             ),
@@ -405,23 +300,34 @@ class SettingsHomeScreen extends StatelessWidget {
       ),
     );
   }
-}
-class CurveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    int curveHeight = 80;
-    Offset controlPoint = Offset(size.width / 2, size.height + curveHeight);
-    Offset endPoint = Offset(size.width, size.height - curveHeight);
-
-    Path path = Path()
-      ..lineTo(0, size.height - curveHeight)
-      ..quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
-      ..lineTo(size.width, 0)
-      ..close();
-
-    return path;
+  Widget label(String name,VoidCallback onclick, String? state){
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
+        padding: const EdgeInsets.only(left: 8, right: 12, bottom: 8, top: 8),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: InkWell(
+          onTap: (){
+            onclick();
+          },
+          child: Row(
+            children: [
+              Text(name, style: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: "Questv"),),
+              const Spacer(),
+              Row(
+                children: [
+                  Text(state??"", style: const TextStyle(color: Colors.grey, fontSize: 12, fontFamily: "Questv"),),
+                  const SizedBox(width: 4,),
+                  Icon(Icons.arrow_forward_ios_rounded, color: lightGreen, size: 18,)
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    ) ;
   }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }

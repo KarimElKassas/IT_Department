@@ -3,6 +3,11 @@ abstract class GroupConversationStates{}
 class GroupConversationInitialState extends GroupConversationStates{}
 
 class GroupConversationChangeUserTypeState extends GroupConversationStates{}
+
+class GroupConversationUpdatePaddingState extends GroupConversationStates{}
+
+class GroupConversationUpdatePaddingAndDragState extends GroupConversationStates{}
+
 class GroupConversationChangeOpacity extends GroupConversationStates{}
 class GroupConversationChangeButtonPosition extends GroupConversationStates{}
 class GroupConversationEndRecord extends GroupConversationStates{}

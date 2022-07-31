@@ -5,6 +5,7 @@ import 'package:it_department/modules/Login/clerk_login_screen.dart';
 import 'package:it_department/modules/Settings/Home/screens/settings_home_screen.dart';
 import 'package:it_department/shared/components.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transition_plus/transition_plus.dart';
 
 import '../../../../shared/local_auth.dart';
 import 'settings_home_states.dart';
@@ -21,6 +22,10 @@ class SettingsHomeCubit extends Cubit<SettingsHomeStates> {
   String myJob = "";
   String myPhone = "";
   String myImage = "";
+  String myCategory = "";
+  String myRank = "";
+  String myDepartment = "";
+  String myPassword = "";
   bool logOutDialogResult = false;
 
   void getMyData() async {
@@ -28,9 +33,13 @@ class SettingsHomeCubit extends Cubit<SettingsHomeStates> {
 
     myID = prefs.getString("ClerkID").toString();
     myName = prefs.getString("ClerkName").toString();
+    myPassword = prefs.getString("ClerkPassword").toString();
     myJob = prefs.getString("ClerkJob").toString();
     myPhone = prefs.getString("ClerkPhone").toString();
     myImage = prefs.getString("ClerkImage").toString();
+    myCategory = prefs.getString("ClerkCategoryName").toString();
+    myRank = prefs.getString("ClerkRankName").toString();
+    myDepartment = prefs.getString("ClerkManagementName").toString();
     emit(SettingsHomeGetMyDataState());
   }
 
@@ -60,4 +69,13 @@ class SettingsHomeCubit extends Cubit<SettingsHomeStates> {
     emit(SettingsHomeChangeLogOutDialogResultState());
   }
 
+  void navigate(BuildContext context, route){
+    Navigator.push(
+        context,
+        ScaleTransition1(
+            page: route,
+            startDuration: const Duration(milliseconds: 600),
+            closeDuration: const Duration(milliseconds: 400),
+            type: ScaleTrasitionTypes.center));
+  }
 }

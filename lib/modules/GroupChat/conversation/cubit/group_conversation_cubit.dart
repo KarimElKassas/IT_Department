@@ -123,6 +123,22 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
   GroupChatImagesModel? chatImagesModel;
   List<GroupChatImagesModel> chatImagesList = [];
 
+  //***********************************************
+  double padding = 0.0 ;
+  double startpoint = 0.01 ;
+  bool drag = true;
+  //***********************************************
+
+  void updateDragPaddingAndBoolValues(double newPadding, bool newDragValue){
+    padding = newPadding;
+    drag = newDragValue;
+    emit(GroupConversationUpdatePaddingAndDragState());
+  }
+  void updateDragPaddingValue(double newPadding){
+    padding = newPadding;
+    emit(GroupConversationUpdatePaddingState());
+  }
+
   void initPageManager(){
     pageManager = PageManager();
   }

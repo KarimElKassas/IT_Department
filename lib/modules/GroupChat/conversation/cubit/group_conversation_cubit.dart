@@ -127,6 +127,8 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
   double padding = 0.0 ;
   double startpoint = 0.01 ;
   bool drag = true;
+  double replyLimit = 200;
+
   //***********************************************
 
   void updateDragPaddingAndBoolValues(double newPadding, bool newDragValue){

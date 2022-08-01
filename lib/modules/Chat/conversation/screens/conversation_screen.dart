@@ -235,12 +235,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
-  Widget voiceNote (String urls, String totalDuration, Color progressBarColor, Color progressBarSecondColor, Color iconColor, Color fontColor){
+  Widget voiceNote (ConversationCubit cubit, String urls, String totalDuration, Color progressBarColor, Color progressBarSecondColor, Color iconColor, Color fontColor){
     return BuildCondition(
       condition: urlint==urls,
       builder: (ctx){
 
-        return VoiceWidget(pageManager: _pageManager, progressbarColor: progressBarColor, progressbarSecondColor: progressBarSecondColor, iconColor: iconColor, fontColor: fontColor,);
+        return VoiceWidget(cubit: cubit, pageManager: _pageManager, progressbarColor: progressBarColor, progressbarSecondColor: progressBarSecondColor, iconColor: iconColor, fontColor: fontColor,);
       },
       fallback: (ctx){
         return  VoiceConstWidget(
@@ -1768,6 +1768,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 children: [
                   Expanded(
                     child: voiceNote(
+                        cubit,
                         cubit.chatListReversed[index].message,
                         cubit.chatListReversed[index].recordDuration,
                         white,
@@ -1833,9 +1834,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     children: [
                       Expanded(
                         child: voiceNote(
+                            cubit,
                             cubit.chatListReversed[index].message,
-                            cubit
-                                .chatListReversed[index].recordDuration,
+                            cubit.chatListReversed[index].recordDuration,
                             lightGreen,
                             orangeColor,
                             lightGreen,

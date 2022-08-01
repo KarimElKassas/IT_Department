@@ -6,6 +6,7 @@ import 'package:it_department/modules/Chat/conversation/cubit/conversation_cubit
 import 'package:it_department/modules/Chat/conversation/cubit/conversation_states.dart';
 import 'package:it_department/modules/Chat/conversation/screens/conversation_screen.dart';
 import 'package:it_department/modules/Chat/widget/page_manager.dart';
+import 'package:it_department/modules/GroupChat/conversation/cubit/group_conversation_cubit.dart';
 import 'package:it_department/shared/components.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -87,11 +88,11 @@ class _IntialScreenState extends State<IntialScreen> {
     );
   }
 
-  Widget voiceNote(String urls, String totalDuration, Color progressBarColor, Color progressBarSecondColor, Color iconColor, Color fontColor) {
+  Widget voiceNote(GroupConversationCubit cubit, String urls, String totalDuration, Color progressBarColor, Color progressBarSecondColor, Color iconColor, Color fontColor) {
     return BuildCondition(
       condition: urlint == urls,
       builder: (ctx) {
-        return VoiceWidget(pageManager: _pageManager, progressbarColor: progressBarColor, progressbarSecondColor: progressBarSecondColor, iconColor: iconColor, fontColor: fontColor,);
+        return VoiceWidget(cubit: cubit, pageManager: _pageManager, progressbarColor: progressBarColor, progressbarSecondColor: progressBarSecondColor, iconColor: iconColor, fontColor: fontColor,);
       },
       fallback: (ctx) {
         return VoiceConstWidget(
@@ -123,8 +124,9 @@ class _IntialScreenState extends State<IntialScreen> {
 }
 
 class VoiceWidget extends StatefulWidget {
-  const VoiceWidget({Key? key, required this.pageManager, required this.progressbarColor, required this.iconColor, required this.progressbarSecondColor, required this.fontColor}) : super(key: key);
+  const VoiceWidget({Key? key, required this.pageManager, required this.progressbarColor, required this.iconColor, required this.progressbarSecondColor, required this.fontColor, required this.cubit}) : super(key: key);
   final PageManager pageManager;
+  final dynamic cubit;
   final Color progressbarColor, progressbarSecondColor, iconColor, fontColor;
   @override
   _VoiceWidgetState createState() => _VoiceWidgetState();
@@ -168,58 +170,156 @@ class _VoiceWidgetState extends State<VoiceWidget> {
               builder: (_, value, __) {
                 switch (value) {
                   case ButtonState.loading:
-                    return Padding(
-                      padding: const EdgeInsets.all(2.0),
-                      child: CircularProgressIndicator(
-                        color: widget.progressbarColor,
-                        strokeWidth: 0.8,
+                    return GestureDetector(
+                      onHorizontalDragStart: (DragStartDetails details){
+                        widget.cubit.startpoint = details.globalPosition.dx;
+                      },
+                      onHorizontalDragUpdate: (DragUpdateDetails details ){
+                        if(details.globalPosition.dx- widget.cubit.startpoint >= 0.0 && widget.cubit.drag){
+
+                          if(details.globalPosition.dx- widget.cubit.startpoint >= widget.cubit.replyLimit){
+                            widget.cubit.updateDragPaddingAndBoolValues(0.0, false);
+                          }else{
+                            widget.cubit.updateDragPaddingValue(details.globalPosition.dx- widget.cubit.startpoint);
+                            print("${details.globalPosition.dx- widget.cubit.startpoint}\n");
+                          }
+                        }
+                      },
+                      onHorizontalDragEnd: (DragEndDetails details){
+                        widget.cubit.updateDragPaddingAndBoolValues(0.0, true);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 6, right: 2),
+                        child: CircularProgressIndicator(
+                          color: widget.progressbarColor,
+                          strokeWidth: 0.8,
+                        ),
                       ),
                     );
                   case ButtonState.paused:
-                    return InkWell(
-                        onTap: widget.pageManager.play,
-                        child: Icon(
-                          Icons.play_arrow_rounded,
-                          color: widget.iconColor,
-                          size: 42,
-                        ),
+                    return GestureDetector(
+                      onHorizontalDragStart: (DragStartDetails details){
+                        widget.cubit.startpoint = details.globalPosition.dx;
+                      },
+                      onHorizontalDragUpdate: (DragUpdateDetails details ){
+                        if(details.globalPosition.dx- widget.cubit.startpoint >= 0.0 && widget.cubit.drag){
+
+                          if(details.globalPosition.dx- widget.cubit.startpoint >= widget.cubit.replyLimit){
+                            widget.cubit.updateDragPaddingAndBoolValues(0.0, false);
+                          }else{
+                            widget.cubit.updateDragPaddingValue(details.globalPosition.dx- widget.cubit.startpoint);
+                            print("${details.globalPosition.dx- widget.cubit.startpoint}\n");
+                          }
+                        }
+                      },
+                      onHorizontalDragEnd: (DragEndDetails details){
+                        widget.cubit.updateDragPaddingAndBoolValues(0.0, true);
+                      },
+                      onTap: widget.pageManager.play,
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        color: widget.iconColor,
+                        size: 42,
+                      ),
                     );
                   case ButtonState.playing:
-                    return InkWell(
+                    return GestureDetector(
+                      onHorizontalDragStart: (DragStartDetails details){
+                        widget.cubit.startpoint = details.globalPosition.dx;
+                      },
+                      onHorizontalDragUpdate: (DragUpdateDetails details ){
+                        if(details.globalPosition.dx- widget.cubit.startpoint >= 0.0 && widget.cubit.drag){
+
+                          if(details.globalPosition.dx- widget.cubit.startpoint >= widget.cubit.replyLimit){
+                            widget.cubit.updateDragPaddingAndBoolValues(0.0, false);
+                          }else{
+                            widget.cubit.updateDragPaddingValue(details.globalPosition.dx- widget.cubit.startpoint);
+                            print("${details.globalPosition.dx- widget.cubit.startpoint}\n");
+                          }
+                        }
+                      },
+                      onHorizontalDragEnd: (DragEndDetails details){
+                        widget.cubit.updateDragPaddingAndBoolValues(0.0, true);
+                      },
                         onTap: widget.pageManager.pause,
                         child: Icon(
                           Icons.pause_rounded,
                           color: widget.iconColor,
                           size: 42,
-                        ));
+                        ),
+                    );
                 }
               },
             ),
           ],
-        ),
-        const SizedBox(
-          width: 8,
         ),
         Flexible(
           child: ValueListenableBuilder<ProgressBarState>(
             valueListenable: widget.pageManager.progressNotifier,
             builder: (_, value, __ ) {
               return Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 8, right: 12, bottom: 6),
-                child: ProgressBar(
-                  progress: value.current,
-                  buffered: value.buffered,
-                  total: value.total,
-                  onSeek: widget.pageManager.seek,
-                  baseBarColor: widget.progressbarColor,
-                  barHeight: 4,
-                  thumbColor: widget.progressbarSecondColor,
-                  progressBarColor: widget.progressbarSecondColor,
-                  bufferedBarColor: widget.progressbarSecondColor,
-                  timeLabelType: TimeLabelType.totalTime,
-                  timeLabelTextStyle:
-                  TextStyle(color: widget.fontColor, fontFamily: "Questv", fontSize: 10),
-                  timeLabelPadding: 2,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                        onHorizontalDragStart: (DragStartDetails details){
+                          widget.cubit.startpoint = details.globalPosition.dx;
+                        },
+                        onHorizontalDragUpdate: (DragUpdateDetails details ){
+                          if(details.globalPosition.dx- widget.cubit.startpoint >= 0.0 && widget.cubit.drag){
+
+                            if(details.globalPosition.dx- widget.cubit.startpoint >= widget.cubit.replyLimit){
+                              widget.cubit.updateDragPaddingAndBoolValues(0.0, false);
+                            }else{
+                              widget.cubit.updateDragPaddingValue(details.globalPosition.dx- widget.cubit.startpoint);
+                              print("${details.globalPosition.dx- widget.cubit.startpoint}\n");
+                            }
+                          }
+                        },
+                        onHorizontalDragEnd: (DragEndDetails details){
+                          widget.cubit.updateDragPaddingAndBoolValues(0.0, true);
+                        },
+                        child: const SizedBox(height: 16,)
+                     ),
+                    ProgressBar(
+                      progress: value.current,
+                      buffered: value.buffered,
+                      total: value.total,
+                      onSeek: widget.pageManager.seek,
+                      baseBarColor: widget.progressbarColor,
+                      barHeight: 3,
+                      thumbCanPaintOutsideBar: false,
+                      thumbRadius: 7,
+                      thumbGlowRadius: 15,
+                      thumbColor: widget.progressbarSecondColor,
+                      progressBarColor: widget.progressbarSecondColor,
+                      bufferedBarColor: widget.progressbarSecondColor,
+                      timeLabelType: TimeLabelType.totalTime,
+                      timeLabelTextStyle:
+                      TextStyle(color: widget.fontColor, fontFamily: "Questv", fontSize: 10),
+                      timeLabelPadding: 8,
+                    ),
+                    GestureDetector(
+                        onHorizontalDragStart: (DragStartDetails details){
+                          widget.cubit.startpoint = details.globalPosition.dx;
+                        },
+                        onHorizontalDragUpdate: (DragUpdateDetails details ){
+                          if(details.globalPosition.dx- widget.cubit.startpoint >= 0.0 && widget.cubit.drag){
+
+                            if(details.globalPosition.dx- widget.cubit.startpoint >= widget.cubit.replyLimit){
+                              widget.cubit.updateDragPaddingAndBoolValues(0.0, false);
+                            }else{
+                              widget.cubit.updateDragPaddingValue(details.globalPosition.dx- widget.cubit.startpoint);
+                              print("${details.globalPosition.dx- widget.cubit.startpoint}\n");
+                            }
+                          }
+                        },
+                        onHorizontalDragEnd: (DragEndDetails details){
+                          widget.cubit.updateDragPaddingAndBoolValues(0.0, true);
+                        },
+                        child: const SizedBox(height: 2,)
+                    ),
+                  ],
                 ),
               );
             },

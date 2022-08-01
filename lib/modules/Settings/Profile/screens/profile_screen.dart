@@ -196,11 +196,10 @@ class ProfileScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 2,),
                                     AutoSizeText(
-                                      userPhone,
+                                      userRank,
                                       style: TextStyle(
                                           color: lightGreen,
-                                          fontFamily: "Questv",
-                                          letterSpacing: 2),
+                                          fontFamily: "Questv"),
                                       minFontSize: 12,
                                       maxLines: 1,
                                       maxFontSize: 16,

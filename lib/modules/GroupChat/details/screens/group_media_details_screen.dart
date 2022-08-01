@@ -256,12 +256,13 @@ class _GroupMediaDetailsScreenState extends State<GroupMediaDetailsScreen> {
     );
   }
 
-  Widget voiceNote(String urls, String totalDuration, Color progressBarColor,
+  Widget voiceNote(GroupMediaDetailsCubit cubit, String urls, String totalDuration, Color progressBarColor,
       Color progressBarSecondColor, Color iconColor, Color fontColor) {
     return BuildCondition(
       condition: urlint == urls,
       builder: (ctx) {
         return VoiceWidget(
+          cubit: cubit,
           pageManager: _pageManager,
           progressbarColor: progressBarColor,
           progressbarSecondColor: progressBarSecondColor,
@@ -421,6 +422,7 @@ class _GroupMediaDetailsScreenState extends State<GroupMediaDetailsScreen> {
                 child: Directionality(
                   textDirection: TextDirection.ltr,
                   child: voiceNote(
+                      cubit,
                       widget.recordsList[index].message,
                       widget.recordsList[index].recordDuration,
                       lightGreen,

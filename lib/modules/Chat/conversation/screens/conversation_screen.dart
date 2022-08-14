@@ -928,6 +928,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => GalleryImageWrapper(
+          isFile: false,
           titleGallery: "",
           galleryItems: imagesList,
           backgroundDecoration: BoxDecoration(

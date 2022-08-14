@@ -8,11 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:it_department/modules/Settings/Home/cubit/settings_home_cubit.dart';
 import 'package:it_department/modules/Settings/Home/cubit/settings_home_states.dart';
+import 'package:it_department/modules/Settings/Language/screens/change_language_screen.dart';
 import 'package:it_department/modules/Settings/Profile/screens/profile_screen.dart';
 import 'package:it_department/shared/constants.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../shared/components.dart';
+import '../../../../shared/fingerprint/screens/fingerprint_setting_screen.dart';
+import '../../Theme/screens/change_theme_screen.dart';
 
 class SettingsHomeScreen extends StatelessWidget {
   const SettingsHomeScreen({Key? key}) : super(key: key);
@@ -138,7 +141,17 @@ class SettingsHomeScreen extends StatelessWidget {
                           textDirection: TextDirection.rtl,
                           child: InkWell(
                             onTap: (){
-
+                              cubit.navigate(context, ProfileScreen(
+                                userID: cubit.myID,
+                                userName: cubit.myName,
+                                userPhone: cubit.myPhone,
+                                userImage: cubit.myImage,
+                                userJob: cubit.myJob,
+                                userRank: cubit.myRank,
+                                userDepartment: cubit.myDepartment,
+                                userCategory: cubit.myCategory,
+                                userPassword: cubit.myPassword,
+                              ));
                             },
                             child: Row(
                               children: [
@@ -267,7 +280,6 @@ class SettingsHomeScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           label('الحساب الشخصى', () {
-                            print("CLICK\n");
                             cubit.navigate(context, ProfileScreen(
                               userID: cubit.myID,
                               userName: cubit.myName,
@@ -280,10 +292,33 @@ class SettingsHomeScreen extends StatelessWidget {
                               userPassword: cubit.myPassword,
                             ));
                           }, ""),
-                          label('مظهر التطبيق', () { }, 'فاتح'),
-                          label('اللغة', () { }, 'العربية'),
-                          label('بصمة الاصبع', () { }, 'مُفعلة'),
-                          label('مساعدة', () { }, ''),
+                          ValueListenableBuilder(
+                            valueListenable: ValueNotifier(currentTheme),
+                            builder: (context, val, _){
+                              return label('مظهر التطبيق', () {
+                                cubit.navigate(context, const ChangeThemeSettingScreen());
+                              }, val! == "dark" ? 'داكن' : 'فاتح');
+                            },
+                          ),
+                          ValueListenableBuilder(
+                            valueListenable: ValueNotifier(currentLanguage),
+                            builder: (context, val, _){
+                              return label('لغة التطبيق', () {
+                                cubit.navigate(context, const ChangeLanguageSettingScreen());
+                              }, val! == "ar" ? 'العربية' : 'English');
+                            },
+                          ),
+                          ValueListenableBuilder(
+                            valueListenable: ValueNotifier(isFingerPrintEnabled),
+                            builder: (context, val, _){
+                              return label('بصمة الاصبع', () {
+                                cubit.navigate(context, const FingerPrintSettingScreen());
+                              }, val! == true ? 'مُفعلة' : 'مُعطلة');
+                            },
+                          ),
+                          label('مساعدة', () {
+
+                          }, ''),
                         ],
                       ),
                     ),
@@ -405,23 +440,4 @@ class SettingsHomeScreen extends StatelessWidget {
       ),
     );
   }
-}
-class CurveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    int curveHeight = 80;
-    Offset controlPoint = Offset(size.width / 2, size.height + curveHeight);
-    Offset endPoint = Offset(size.width, size.height - curveHeight);
-
-    Path path = Path()
-      ..lineTo(0, size.height - curveHeight)
-      ..quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
-      ..lineTo(size.width, 0)
-      ..close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }

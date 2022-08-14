@@ -127,6 +127,61 @@ class BlurryDialog extends StatelessWidget {
   }
 }
 
+class TextFieldDialog extends StatelessWidget {
+
+  Widget content;
+  TextStyle? titleTextStyle;
+  TextStyle? contentTextStyle;
+  TextStyle? okTextStyle;
+  TextStyle? noTextStyle;
+  double? titleTextMinSize;
+  double? titleTextMaxSize;
+  double? contentTextMinSize;
+  double? contentTextMaxSize;
+  int? contentTextMaxLines;
+  double? okTextMinSize;
+  double? okTextMaxSize;
+  double? noTextMinSize;
+  double? noTextMaxSize;
+  double? blurValue;
+  VoidCallback continueCallBack;
+  VoidCallback cancelCallBack;
+
+  TextFieldDialog(this.content, this.continueCallBack, this.cancelCallBack, {this.titleTextStyle, this.contentTextStyle, this.okTextStyle, this.noTextStyle, this.blurValue, this.titleTextMinSize, this.titleTextMaxSize, this.contentTextMinSize, this.contentTextMaxSize, this.contentTextMaxLines, this.okTextMinSize, this.okTextMaxSize, this.noTextMinSize, this.noTextMaxSize});
+  TextStyle textStyle = const TextStyle (color: Colors.teal, fontSize: 12);
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: ui.TextDirection.rtl,
+      child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: blurValue??4, sigmaY: blurValue??4),
+          child:  AlertDialog(
+            content: content,
+            contentPadding: EdgeInsets.all(8),
+            actions: <Widget>[
+              TextButton(
+                child: AutoSizeText("نعم", style: okTextStyle??textStyle, minFontSize: okTextMinSize??10, maxLines: 1, maxFontSize: okTextMaxSize??12,),
+                onPressed: () {
+                  continueCallBack();
+                },
+                style: ButtonStyle(overlayColor: MaterialStateColor.resolveWith((states) => veryLightGreen.withOpacity(0.08))),
+              ),
+              TextButton(
+                child: AutoSizeText("الغاء", style: noTextStyle??textStyle,minFontSize: noTextMinSize??10, maxLines: 1, maxFontSize: noTextMaxSize??12,),
+                onPressed: () {
+                  cancelCallBack();
+                },
+                style: ButtonStyle(overlayColor: MaterialStateColor.resolveWith((states) => veryLightGreen.withOpacity(0.08))),
+              ),
+            ],
+            buttonPadding: const EdgeInsets.all(4),
+          ),
+      ),
+    );
+  }
+}
+
 class BlurryProgressDialog extends StatelessWidget {
   final String title;
   TextStyle? titleStyle;
@@ -150,6 +205,80 @@ class BlurryProgressDialog extends StatelessWidget {
               ],
             ),
           )),
+    );
+  }
+}
+
+class CustomSwitch extends StatefulWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  CustomSwitch({Key? key, required this.value, required this.onChanged})
+      : super(key: key);
+
+  @override
+  _CustomSwitchState createState() => _CustomSwitchState();
+}
+
+class _CustomSwitchState extends State<CustomSwitch>
+    with SingleTickerProviderStateMixin {
+  Animation? _circleAnimation;
+  AnimationController? _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 60));
+    _circleAnimation = AlignmentTween(
+        begin: widget.value ? Alignment.centerRight : Alignment.centerLeft,
+        end: widget.value ? Alignment.centerLeft : Alignment.centerRight)
+        .animate(CurvedAnimation(
+        parent: _animationController!, curve: Curves.linear));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animationController!,
+      builder: (context, child) {
+        return GestureDetector(
+          onTap: () {
+            if (_animationController!.isCompleted) {
+              _animationController!.reverse();
+            } else {
+              _animationController!.forward();
+            }
+            widget.value == false
+                ? widget.onChanged(true)
+                : widget.onChanged(false);
+          },
+          child: Container(
+            width: 48.0,
+            height: 28.0,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24.0),
+              color: !widget.value
+                  ? Colors.grey
+                  : lightGreen,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 2.0, bottom: 2.0, right: 2.0, left: 2.0),
+              child: Container(
+                alignment:
+                widget.value ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  width: 20.0,
+                  height: 20.0,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

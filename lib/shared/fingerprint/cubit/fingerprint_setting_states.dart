@@ -1,0 +1,10 @@
+abstract class FingerPrintSettingStates{}
+
+class FingerPrintSettingInitialState extends FingerPrintSettingStates{}
+
+class FingerPrintSettingGetFingerValueState extends FingerPrintSettingStates{}
+
+class FingerPrintSettingChangeFingerValueState extends FingerPrintSettingStates{}
+
+class FingerPrintSettingChangeFingerLockTimeState extends FingerPrintSettingStates{}
+

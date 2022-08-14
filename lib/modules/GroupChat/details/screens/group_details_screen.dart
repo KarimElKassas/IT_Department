@@ -594,6 +594,7 @@ class GroupDetailsScreen extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => GalleryImageWrapper(
+          isFile: false,
           titleGallery: "",
           galleryItems: imagesList,
           backgroundDecoration: BoxDecoration(

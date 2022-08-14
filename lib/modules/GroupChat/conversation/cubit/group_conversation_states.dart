@@ -8,6 +8,8 @@ class GroupConversationUpdatePaddingState extends GroupConversationStates{}
 
 class GroupConversationUpdatePaddingAndDragState extends GroupConversationStates{}
 
+class GroupConversationUpdateDraggableRecordState extends GroupConversationStates{}
+
 class GroupConversationChangeOpacity extends GroupConversationStates{}
 class GroupConversationChangeButtonPosition extends GroupConversationStates{}
 class GroupConversationEndRecord extends GroupConversationStates{}

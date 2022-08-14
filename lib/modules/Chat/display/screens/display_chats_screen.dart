@@ -15,6 +15,7 @@ import 'package:it_department/shared/constants.dart';
 import 'package:it_department/shared/fingerprint/screens/fingerprint_screen.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../../shared/local_notification.dart';
 import '../../../GroupChat/create/screens/select_group_users_screen.dart';
 import '../cubit/display_chats_cubit.dart';
 import '../cubit/display_chats_states.dart';
@@ -84,6 +85,7 @@ class DisplayChatsScreen extends StatelessWidget {
                               const SizedBox(width: 8,),
                               GestureDetector(
                                 onTap: (){
+                                  lastOpenedScreen = "FingerPrintScreen";
                                   navigateTo(context, const FingerPrintScreen(openedFrom: "Display",));
                                 },
                                 child: const Icon(
@@ -119,7 +121,8 @@ class DisplayChatsScreen extends StatelessWidget {
                           builder: (context) {
                             return FloatingActionButton(
                               onPressed: () {
-                                cubit.navigate(context, DefaultTabController.of(context)!.index == 0 ? const NewChatScreen() : const SelectGroupUsersScreen());
+                                LocalNotification.showLocalNotification();
+                                //cubit.navigate(context, DefaultTabController.of(context)!.index == 0 ? const NewChatScreen() : const SelectGroupUsersScreen());
                               },
                               child: const Icon(
                                 Icons.chat_rounded,

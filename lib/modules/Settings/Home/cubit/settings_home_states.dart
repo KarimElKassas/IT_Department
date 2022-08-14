@@ -5,3 +5,5 @@ class SettingsHomeInitialState extends SettingsHomeStates{}
 class SettingsHomeGetMyDataState extends SettingsHomeStates{}
 
 class SettingsHomeChangeLogOutDialogResultState extends SettingsHomeStates{}
+
+class SettingsHomeRefreshDataState extends SettingsHomeStates{}

@@ -8,6 +8,7 @@ import 'package:it_department/modules/Chat/display/screens/display_chats_screen.
 import 'package:it_department/modules/Home/screens/home_screen.dart';
 import 'package:it_department/modules/SplashScreen/cubit/splash_states.dart';
 import 'package:it_department/modules/onBoarding/screens/on_boarding_screen.dart';
+import 'package:it_department/shared/constants.dart';
 import 'package:it_department/shared/fingerprint/screens/fingerprint_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,13 +41,14 @@ class SplashCubit extends Cubit<SplashStates> {
         print("DIFFERENCE : ${currentTimeInMillis - lastFingerTime}\n");
         if(currentTimeInMillis - lastFingerTime > 60000){
           print("DIFFERENCE IN : ${currentTimeInMillis - lastFingerTime}\n");
+          lastOpenedScreen = "FingerPrintScreen";
           finish(context, const FingerPrintScreen(openedFrom: "Splash",));
         }else{
           finish(context, DisplayChatsScreen(initialIndex: 0));
         }
       }else{
         await getDepartmentManager(prefs.getString("ClerkManagementID")!.toString());
-        finish(context, (managerID != prefs.getString("ClerkNumber")!.toString()) ? const HomeScreen() : const HomeScreen());
+        finish(context, (managerID != prefs.getString("ClerkNumber")!.toString()) ? DisplayChatsScreen(initialIndex: 0) : DisplayChatsScreen(initialIndex: 0));
       }
     }else{
       finish(context, ClerkLoginScreen());

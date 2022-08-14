@@ -45,7 +45,8 @@ class FingerPrintCubit extends Cubit<FingerPrintStates>{
 
   void cancelAuthentication(BuildContext context) {
     LocalAuthentication.stopAuthentication();
-    finish(context, DisplayChatsScreen(initialIndex: 0));
+    Navigator.pop(context);
+    //finish(context, DisplayChatsScreen(initialIndex: 0));
     emit(FingerPrintCancelState());
   }
 }

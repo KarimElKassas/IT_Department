@@ -1,0 +1,4 @@
+enum MyRadioButtonTextPosition {
+  right,
+  left,
+}

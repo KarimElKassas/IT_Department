@@ -7,6 +7,7 @@ import 'package:it_department/shared/components.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transition_plus/transition_plus.dart';
 
+import '../../../../shared/constants.dart';
 import '../../../../shared/local_auth.dart';
 import 'settings_home_states.dart';
 
@@ -30,7 +31,6 @@ class SettingsHomeCubit extends Cubit<SettingsHomeStates> {
 
   void getMyData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     myID = prefs.getString("ClerkID").toString();
     myName = prefs.getString("ClerkName").toString();
     myPassword = prefs.getString("ClerkPassword").toString();
@@ -40,6 +40,21 @@ class SettingsHomeCubit extends Cubit<SettingsHomeStates> {
     myCategory = prefs.getString("ClerkCategoryName").toString();
     myRank = prefs.getString("ClerkRankName").toString();
     myDepartment = prefs.getString("ClerkManagementName").toString();
+    if(prefs.containsKey("AppTheme")){
+      currentTheme = prefs.getString("AppTheme").toString();
+    }else{
+      currentTheme = "light";
+    }
+    if(prefs.containsKey("AppLanguage")){
+      currentLanguage = prefs.getString("AppLanguage").toString();
+    }else{
+      currentLanguage = "ar";
+    }
+    if(prefs.containsKey("isFingerPrintEnabled")){
+      isFingerPrintEnabled = prefs.getBool("isFingerPrintEnabled")!;
+    }else{
+      isFingerPrintEnabled = false;
+    }
     emit(SettingsHomeGetMyDataState());
   }
 
@@ -76,6 +91,9 @@ class SettingsHomeCubit extends Cubit<SettingsHomeStates> {
             page: route,
             startDuration: const Duration(milliseconds: 600),
             closeDuration: const Duration(milliseconds: 400),
-            type: ScaleTrasitionTypes.center));
+            type: ScaleTrasitionTypes.center)).then((value){
+                 emit(SettingsHomeRefreshDataState());
+    });
   }
+
 }

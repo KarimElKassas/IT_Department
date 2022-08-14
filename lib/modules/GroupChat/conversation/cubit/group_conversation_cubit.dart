@@ -124,13 +124,17 @@ class GroupConversationCubit extends Cubit<GroupConversationStates> {
   List<GroupChatImagesModel> chatImagesList = [];
 
   //***********************************************
+  String draggableRecord = "" ;
   double padding = 0.0 ;
   double startpoint = 0.01 ;
   bool drag = true;
   double replyLimit = 200;
 
   //***********************************************
-
+  void setDraggableRecord(String messageID){
+    draggableRecord = messageID;
+    emit(GroupConversationUpdateDraggableRecordState());
+  }
   void updateDragPaddingAndBoolValues(double newPadding, bool newDragValue){
     padding = newPadding;
     drag = newDragValue;

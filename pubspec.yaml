@@ -41,6 +41,7 @@ dependencies:
   network_info_plus: ^2.1.1
   intl: ^0.17.0
   font_awesome_flutter: ^9.2.0
+  awesome_notifications: ^0.6.21
   image_picker: ^0.8.4+4
   firebase_core: ^1.10.5
   firebase_database: ^8.0.0

@@ -25,9 +25,14 @@ class FingerPrintScreen extends StatelessWidget {
           if(state is FingerPrintSuccessState){
             Future.delayed(const Duration(milliseconds: 500)).then((value){
               if(openedFrom == "Splash"){
+                lastOpenedScreen = "";
                 finish(context, DisplayChatsScreen(initialIndex: 0));
               }else if(openedFrom == "Display"){
+                lastOpenedScreen = "";
                 finish(context, const SettingsHomeScreen());
+              }else if(openedFrom == "Main"){
+                lastOpenedScreen = "";
+                Navigator.pop(context);
               }
             });
           }
@@ -38,8 +43,14 @@ class FingerPrintScreen extends StatelessWidget {
 
           return WillPopScope(
             onWillPop: (){
-              cubit.cancelAuthentication(context);
-              return Future.value(false);
+              if(openedFrom == "Main"){
+                return Future.value(false);
+              }else{
+                lastOpenedScreen = "";
+                cubit.cancelAuthentication(context);
+                return Future.value(false);
+              }
+
             },
             child: Scaffold(
               appBar: AppBar(

@@ -443,6 +443,7 @@ class _GroupMediaDetailsScreenState extends State<GroupMediaDetailsScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => GalleryImageWrapper(
+          isFile: false,
           titleGallery: "",
           galleryItems: widget.imagesList,
           backgroundDecoration: BoxDecoration(

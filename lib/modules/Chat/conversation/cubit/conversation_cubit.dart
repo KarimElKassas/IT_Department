@@ -208,8 +208,36 @@ class ConversationCubit extends Cubit<ConversationStates> {
       String message, String notificationID, String receiverToken) async {
     var serverKey =
         'AAAAnuydfc0:APA91bF3jkS5-JWRVnTk3mEBnj2WI70EYJ1zC7Q7TAI6GWlCPTd37SiEkhuRZMa8Uhu9HTZQi1oiCEQ2iKQgxljSyLtWTAxN4HoB3pyfTuyNQLjXtf58s99nAEivs2L6NzEL0laSykTK';
+    Future.delayed(const Duration(seconds: 3)).then((value)async {
+      await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'key=$serverKey',
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{
+              'body': message,
+              'title': userName
+            },
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': Random().nextInt(100),
+              'status': 'done'
+            },
+            'to': 'eQee_LpdS4-raEmF4Dlvvz:APA91bGbUJs0-4FoM0p7ctbN6kexrr0BOKgmbQgSgbUPTJfa1iULiIj-5udYJ8a1ACBghJ4wBS05OrckIs2HruyV9iS6V29vcYs1ML99QRS10pJtXONoVV11CFbECzMfHVpor5QEcjO0',
+          },
+        ),
+      ).then((value){
+        print("notification sent\n");
+      }).catchError((error){
+        print("error in notification : $error\n");
+      });
+    });
 
-    await http.post(
+    /*await http.post(
       Uri.parse('https://fcm.googleapis.com/fcm/send'),
       headers: <String, String>{
         'Content-Type': 'application/json',
@@ -217,9 +245,28 @@ class ConversationCubit extends Cubit<ConversationStates> {
       },
       body: jsonEncode(
         <String, dynamic>{
-          'notification': <String, dynamic>{
-            'body': message,
-            'title': 'لديك رسالة جديدة'
+          'notification': {
+            'title': 'Sparky says hello!'
+          },
+          'android': {
+            'notification': {
+              'imageUrl': 'https://firebasestorage.googleapis.com/v0/b/it-department-2022.appspot.com/o/Chats%2F2022-07-05-14-51-10?alt=media'
+            }
+          },
+          'apns': {
+            'payload': {
+              'aps': {
+                'mutable-content': 1
+              }
+            },
+            'fcm_options': {
+              'image': 'https://firebasestorage.googleapis.com/v0/b/it-department-2022.appspot.com/o/Chats%2F2022-07-05-14-51-10?alt=media'
+            }
+          },
+          'webpush': {
+            'headers': {
+              'image': 'https://firebasestorage.googleapis.com/v0/b/it-department-2022.appspot.com/o/Chats%2F2022-07-05-14-51-10?alt=media'
+            }
           },
           'priority': 'high',
           'data': <String, dynamic>{
@@ -227,10 +274,10 @@ class ConversationCubit extends Cubit<ConversationStates> {
             'id': Random().nextInt(100),
             'status': 'done'
           },
-          'to': receiverToken,
+          'to': 'cFLhR4YkQ8Otm_2CDM88Sn:APA91bEy2pe3nPf-vFG10dfa4khT1kwzhk-KWDQnxqnSQdwbvEWlcNqL3OhfkmfBWo-Wx1DqIRsnlgCqKfNB5JwYS0kCrkwTfEmVVpNWpovAOopunMKqnKSv6jydB0_UGOcVivBaQtxW',
         },
       ),
-    );
+    );*/
   }
 
   void sendFireStoreMessage(String receiverID, String chatID, String message,

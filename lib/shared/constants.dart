@@ -17,6 +17,11 @@ List<dynamic>? messageImagesStaticList = [];
 bool customerLogged = false;
 bool imagesUploaded = false;
 String uploadingImagesMessageID = "";
+String lastOpenedScreen = "";
+String currentLanguage = "";
+String currentTheme = "";
+String currentDraggableRecord = "";
+bool isFingerPrintEnabled = false;
 
 final messageControllerValue = ValueNotifier<String>("");
 final startedRecordValue = ValueNotifier<bool>(false);

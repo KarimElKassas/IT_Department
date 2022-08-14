@@ -1111,6 +1111,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => GalleryImageWrapper(
+          isFile: false,
           titleGallery: "",
           galleryItems: imagesList,
           backgroundDecoration: BoxDecoration(
@@ -1434,7 +1435,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
       return Container(
         width: 100.w,
         height: 65,
-        color: Colors.red,
+        //color: Colors.red,
         margin: cubit.chatListReversed[index].senderID == cubit.userID
             ? const EdgeInsets.only(
           top: 5.0,
@@ -1479,7 +1480,6 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-
                               voiceNote(
                                   cubit,
                                   cubit.chatListReversed[index].message,
@@ -1493,7 +1493,11 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                         ),
                         GestureDetector(
                           onHorizontalDragStart: (DragStartDetails details){
-                            cubit.startpoint = details.globalPosition.dx;
+                            cubit.setDraggableRecord(cubit.chatListReversed[index].messageFullTime);
+                            if(cubit.draggableRecord == cubit.chatListReversed[index].messageFullTime){
+                              print("Current Record Duration : ${cubit.chatListReversed[index].recordDuration}\n");
+                              cubit.startpoint = details.globalPosition.dx;
+                            }
                           },
                           onHorizontalDragUpdate: (DragUpdateDetails details ){
                             if(details.globalPosition.dx- cubit.startpoint >= 0 && cubit.drag){
@@ -1502,7 +1506,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                                 cubit.updateDragPaddingAndBoolValues(0.0, false);
                               }else{
                                 cubit.updateDragPaddingValue(details.globalPosition.dx- cubit.startpoint);
-                                print("${details.globalPosition.dx- cubit.startpoint}\n");
+                                //print("${details.globalPosition.dx- cubit.startpoint}\n");
                               }
                             }
                           },

@@ -121,7 +121,7 @@ class DisplayChatsScreen extends StatelessWidget {
                           builder: (context) {
                             return FloatingActionButton(
                               onPressed: () {
-                                LocalNotification.showLocalNotification();
+                                //LocalNotification.showNotification(message);
                                 //cubit.navigate(context, DefaultTabController.of(context)!.index == 0 ? const NewChatScreen() : const SelectGroupUsersScreen());
                               },
                               child: const Icon(

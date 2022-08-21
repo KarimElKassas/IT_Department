@@ -99,3 +99,4 @@ class ConversationDownloadFileErrorState extends ConversationStates{
 class ConversationChangeOpacity extends ConversationStates{}
 class ConversationChangeButtonPosition extends ConversationStates{}
 class ConversationEndRecord extends ConversationStates{}
+class ConversationGetChatData extends ConversationStates{}

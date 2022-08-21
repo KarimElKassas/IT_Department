@@ -1,56 +1,82 @@
+import 'dart:convert';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:it_department/shared/constants.dart';
 
-class LocalNotification{
-  static AndroidNotificationChannel channel = const AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
-      description: 'This channel is used for important notifications.', // description
-      importance: Importance.high,
-      playSound: true);
+class LocalNotification {
+  static showNotification(RemoteMessage message) {
+    Map<String, dynamic> dataMap = message.data;
+    Map<String, String> payloadMap = {};
+    dataMap.forEach((key, value) {
+      if(key == "payload"){
+        Map valueMap = jsonDecode(value);
+        payloadMap["senderID"] = valueMap["senderID"].toString();
+        payloadMap["channelKey"] = valueMap["channelKey"].toString();
+        payloadMap["chatID"] = valueMap["chatID"].toString();
+      }
 
-  static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
-  static Future<void> showNotification(RemoteMessage payload) async {
+    });
+    var notificationType = NotificationLayout.Default;
 
-    var android = AndroidInitializationSettings('logo_rs');
-    var initiallizationSettingsIOS = IOSInitializationSettings();
-    var initialSetting = new InitializationSettings(android: android, iOS: initiallizationSettingsIOS);
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    flutterLocalNotificationsPlugin.initialize(initialSetting);
+    notificationType = dataMap["type"] == "Image"
+        ? NotificationLayout.BigPicture
+        : NotificationLayout.BigText;
 
+    AwesomeNotifications().initialize(
+      null,
+      [
+        NotificationChannel(
+          channelGroupKey: 'image_test',
+          channelKey: "image",
+          channelName: 'image notifications',
+          channelDescription: 'Notification channel for image tests',
+          defaultColor: Colors.redAccent,
+          ledColor: Colors.yellow,
+          channelShowBadge: true,
+          importance: NotificationImportance.High,
+          enableLights: true,
+          defaultPrivacy: NotificationPrivacy.Public,
 
-
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-        'default_notification_channel_id',
-        'Notification',
-        channelDescription: 'All Notification is Here',
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-        icon: "logo_rs",
-        playSound: true,
-        sound: RawResourceAndroidNotificationSound("notification")
+          //icon: '@mipmap/ic_launcher'
+        ),
+      ],
     );
-    const iOSDetails = IOSNotificationDetails();
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidDetails, iOS: iOSDetails);
+    AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          //with asset image
+          id: 1234,
+          channelKey: 'image',
+          title: dataMap["title"],
+          body: dataMap["body"],
+          bigPicture: dataMap["image"],
+          notificationLayout: notificationType,
+          displayOnForeground: true,
+          wakeUpScreen: true,
+          displayOnBackground: true,
+          ticker: "اصحى معانا متنامشى",
+          //icon: '@mipmap/ic_launcher'
+          payload: payloadMap,
+          backgroundColor: lightGreen,
 
-    await flutterLocalNotificationsPlugin.show(0, payload.notification!.title, payload.notification!.body, platformChannelSpecifics);
+        ),
+        actionButtons: [
+          NotificationActionButton(
+            key: "REPLY_BUTTON",
+            label: "رد",
+            color: Colors.white,
+            isDangerousOption: false,
+            buttonType: ActionButtonType.InputField,
+          ),
+          NotificationActionButton(
+            key: "SEEN_BUTTON",
+            label: "تمييز كمقروء",
+            color: Colors.white,
+            isDangerousOption: false,
+            buttonType: ActionButtonType.KeepOnTop,
+          ),
+        ],
+    );
   }
-  static void showLocalNotification() {
-
-    flutterLocalNotificationsPlugin.show(
-        0,
-        "Testing",
-        "How you doin ?",
-        NotificationDetails(
-            android: AndroidNotificationDetails(channel.id, channel.name, channelDescription: channel.description,
-                importance: Importance.high,
-                color: Colors.blue,
-                playSound: true,
-                icon: '@mipmap/ic_launcher')));
-  }
-
 }

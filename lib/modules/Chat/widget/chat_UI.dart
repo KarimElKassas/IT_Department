@@ -442,7 +442,7 @@ class _ChatUIState extends State<ChatUI> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ConversationCubit()..changeOpacity()..getChatData(widget.receiverID, widget.receiverName, widget.receiverImage, widget.receiverToken, widget.chatID),
+      create: (context) => ConversationCubit()..changeOpacity()..getChatData(widget.receiverID, widget.chatID),
       child: BlocConsumer<ConversationCubit, ConversationStates>(
         listener: (context, state){},
         builder: (context,state){

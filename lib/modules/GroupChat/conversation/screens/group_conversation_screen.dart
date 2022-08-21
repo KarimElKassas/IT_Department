@@ -1,6 +1,5 @@
 import 'package:buildcondition/buildcondition.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -346,10 +345,8 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                   messageControllerValue.value = value.toString();
 
                   if (value.isEmpty || value.characters.isEmpty) {
-                    print("FIRST CASE\n");
                     cubit.changeUserState("1");
                   } else {
-                    print("SECOND CASE\n");
                     cubit.changeUserState("2");
                   }
                 },
@@ -435,7 +432,7 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
       child: Text(
         "${cubit.groupMembersNameList[index].toString()} , ",
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(
+        style: const TextStyle(
             overflow: TextOverflow.ellipsis,
             fontSize: 10,
             fontFamily: "Questv",
@@ -1430,7 +1427,6 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
 
   Widget audioConversationManagement2(BuildContext itemBuilderContext,
       int index, GroupConversationCubit cubit) {
-    print("USER IDDDDD ${cubit.userID}\n");
     if (cubit.chatListReversed[index].type == "audio") {
       return Container(
         width: 100.w,
@@ -1495,7 +1491,6 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                           onHorizontalDragStart: (DragStartDetails details){
                             cubit.setDraggableRecord(cubit.chatListReversed[index].messageFullTime);
                             if(cubit.draggableRecord == cubit.chatListReversed[index].messageFullTime){
-                              print("Current Record Duration : ${cubit.chatListReversed[index].recordDuration}\n");
                               cubit.startpoint = details.globalPosition.dx;
                             }
                           },

@@ -73,7 +73,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ConversationCubit()
-        ..getChatData(widget.userID, widget.userName, widget.userImage, widget.userToken, widget.chatID)
+        ..getChatData(widget.userID, widget.chatID)
         ..createUserImagesDirectory()
         ..createUserDocumentsDirectory()
         ..createUserRecordingsDirectory()

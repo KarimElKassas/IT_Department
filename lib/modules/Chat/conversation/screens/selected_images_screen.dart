@@ -58,7 +58,7 @@ class _SelectedImagesScreenState extends State<SelectedImagesScreen> {
     print(widget.chatImages);
     print("${widget.chatImages!.length}\n");
     return BlocProvider(
-      create: (context) => ConversationCubit()..getChatData(widget.receiverID, widget.receiverName, widget.receiverImage, widget.receiverToken, widget.chatID),
+      create: (context) => ConversationCubit()..getChatData(widget.receiverID, widget.chatID),
       child: BlocConsumer<ConversationCubit, ConversationStates>(
         listener: (context, state){},
         builder: (context, state){
